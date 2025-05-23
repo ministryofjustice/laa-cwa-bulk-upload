@@ -17,14 +17,21 @@ import org.springframework.security.oauth2.core.AuthorizationGrantType;
 @Configuration
 public class EntraIdConfig {
 
-    @Value("${azure.activedirectory.client-id}")
+    @Value("${azure.entra-id.client-id}")
     private String clientId;
 
-    @Value("${azure.activedirectory.client-secret}")
+    @Value("${azure.entra-id.client-secret}")
     private String clientSecret;
 
-    @Value("${azure.activedirectory.tenant-id}")
+    @Value("${azure.entra-id.tenant-id}")
     private String tenantId;
+
+    @Value("${azure.entra-id.scope}")
+    private String scope;
+
+    @Value("${azure.entra-id.cloud-instance}")
+    private String cloudInstance;
+
 
     @Bean
     public ClientRegistrationRepository clientRegistrationRepository() {
@@ -52,8 +59,8 @@ public class EntraIdConfig {
                 .clientId(clientId)
                 .clientSecret(clientSecret)
                 .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
-                .tokenUri(String.format("https://login.microsoftonline.com/%s/oauth2/v2.0/token", tenantId))
-                .scope("api://laa-sds-dev/.default")
+                .tokenUri(String.format("%s/%s/oauth2/v2.0/token", cloudInstance, tenantId))
+                .scope(scope)
                 .build();
     }
 }

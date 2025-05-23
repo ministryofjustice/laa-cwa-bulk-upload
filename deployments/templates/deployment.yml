@@ -27,3 +27,34 @@ spec:
               type: RuntimeDefault
             runAsNonRoot: true
             runAsUser: 1001
+          env:
+            - name: SDS_API_URL
+              valueFrom:
+                secretKeyRef:
+                  name: cwa-bulk-upload-secrets
+                  key: SDS_API_URL
+            - name: SSO_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: cwa-bulk-upload-secrets
+                  key: SSO_CLIENT_ID
+            - name: SSO_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: cwa-bulk-upload-secrets
+                  key: SSO_CLIENT_SECRET
+            - name: SSO_CLOUD_INSTANCE
+              valueFrom:
+                secretKeyRef:
+                  name: cwa-bulk-upload-secrets
+                  key: SSO_CLIENT_SECRET
+            - name: SSO_SCOPE
+              valueFrom:
+                secretKeyRef:
+                  name: cwa-bulk-upload-secrets
+                  key: SSO_SCOPE
+            - name: SSO_TENANT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: cwa-bulk-upload-secrets
+                  key: SSO_TENANT_ID

@@ -1,26 +1,18 @@
 server:
   port: 8082
-spring:
-  security:
-    oauth2:
-      client:
-        registration:
-          messaging-client:
-            provider: spring
-            client-id: client1
-            client-secret: my-secret
-            authorization-grant-type: authorization_code
-            scope: message.read,message.write
-        provider:
-          spring:
-            issuer-uri: http://localhost:9000
   servlet:
     multipart:
       max-file-size: 10MB
       max-request-size: 10MB
 
 azure:
-  activedirectory:
-    tenant-id:
-    client-id:
-    client-secret:
+  entra-id:
+    client-id: ${SSO_CLIENT_ID}
+    client-secret: ${SSO_CLIENT_SECRET}
+    cloud-instance: ${SSO_CLOUD_INSTANCE}
+    scope: ${SSO_SCOPE}
+    tenant-id: ${SSO_TENANT_ID}
+
+sds-api:
+  url: ${SDS_API_URL}
+
