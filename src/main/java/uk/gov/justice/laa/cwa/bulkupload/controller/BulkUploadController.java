@@ -5,12 +5,20 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
+import uk.gov.justice.laa.cwa.bulkupload.response.UploadResponseDto;
+import uk.gov.justice.laa.cwa.bulkupload.service.VirusCheckService;
 
 /**
  * Controller for handling the bulk upload requests.
  */
 @Controller
 public class BulkUploadController {
+
+    private final VirusCheckService virusCheckService;
+
+    public BulkUploadController(VirusCheckService virusCheckService) {
+        this.virusCheckService = virusCheckService;
+    }
 
     /**
      * Renders the upload page.
@@ -33,7 +41,12 @@ public class BulkUploadController {
         if (file.isEmpty()) {
             return "pages/upload-failure";
         }
-
+        try {
+            UploadResponseDto UploadResponseDto=  virusCheckService.checkVirus(file);
+            System.out.println("UploadResponseDto :: "+UploadResponseDto.getDetail());
+        } catch(Exception e){
+            e.printStackTrace();
+        }
 
         return "pages/upload-success";
     }
