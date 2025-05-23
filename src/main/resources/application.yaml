@@ -1,2 +1,20 @@
 server:
   port: 8082
+spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          messaging-client:
+            provider: spring
+            client-id: client1
+            client-secret: my-secret
+            authorization-grant-type: authorization_code
+            scope: message.read,message.write
+        provider:
+          spring:
+            issuer-uri: http://localhost:9000
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB

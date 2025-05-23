@@ -33,6 +33,8 @@ public class BulkUploadController {
         if (file.isEmpty()) {
             return "pages/upload-failure";
         }
+
+
         return "pages/upload-success";
     }
 }
