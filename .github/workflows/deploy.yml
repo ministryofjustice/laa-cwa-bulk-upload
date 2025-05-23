@@ -3,8 +3,7 @@ name: Build and deploy
 on:
   push:
     branches:
-#      - main
-      - OAuth
+      - main
   workflow_dispatch:
 
 jobs:

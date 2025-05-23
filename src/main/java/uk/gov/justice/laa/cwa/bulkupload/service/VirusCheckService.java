@@ -1,6 +1,5 @@
 package uk.gov.justice.laa.cwa.bulkupload.service;
 
-import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
@@ -8,7 +7,6 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.multipart.MultipartFile;
 import uk.gov.justice.laa.cwa.bulkupload.response.UploadResponseDto;
-
 
 import java.io.IOException;
 
@@ -31,7 +29,7 @@ public class VirusCheckService {
         return restClient.put()
                 .uri("/virus_check_file")
                 .contentType(MediaType.MULTIPART_FORM_DATA)
-                .header("Authorization", "Bearer "+tokenService.getAccessToken())
+                .header("Authorization", "Bearer " + tokenService.getAccessToken())
                 .body(body)
                 .retrieve()
                 .body(UploadResponseDto.class);

@@ -41,10 +41,7 @@ spec:
                   key: AUTH_CLIENT_SECRET
 
             - name: AUTH_CLOUD_INSTANCE
-              valueFrom:
-                secretKeyRef:
-                  name: cwa-bulk-upload-secrets
-                  key: AUTH_CLOUD_INSTANCE
+              value : https://login.microsoftonline.com
 
             - name: AUTH_SCOPE
               valueFrom:

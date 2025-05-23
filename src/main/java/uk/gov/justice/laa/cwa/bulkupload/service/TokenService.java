@@ -21,8 +21,8 @@ public class TokenService {
     }
 
     public String getAccessToken() {
-        if (accessToken != null && accessToken.getExpiresAt() != null &&
-                accessToken.getExpiresAt().isAfter(Instant.now().plusSeconds(60))) {
+        if (accessToken != null && accessToken.getExpiresAt() != null
+                && accessToken.getExpiresAt().isAfter(Instant.now().plusSeconds(60))) {
             return accessToken.getTokenValue();
         }
 
