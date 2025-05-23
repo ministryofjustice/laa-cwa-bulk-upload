@@ -36,7 +36,7 @@ java {
 test {
     // Use JUnit Platform for unit tests.
     useJUnitPlatform()
-    finalizedBy jacocotestreport
+    finalizedBy jacocoTestReport
 }
 
 
