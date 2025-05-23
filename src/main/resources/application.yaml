@@ -7,11 +7,11 @@ server:
 
 azure:
   entra-id:
-    client-id: ${SSO_CLIENT_ID}
-    client-secret: ${SSO_CLIENT_SECRET}
-    cloud-instance: ${SSO_CLOUD_INSTANCE}
-    scope: ${SSO_SCOPE}
-    tenant-id: ${SSO_TENANT_ID}
+    client-id: ${AUTH_CLIENT_ID}
+    client-secret: ${AUTH_CLIENT_SECRET}
+    cloud-instance: ${AUTH_CLOUD_INSTANCE}
+    scope: ${AUTH_SCOPE}
+    tenant-id: ${AUTH_TENANT_ID}
 
 sds-api:
   url: ${SDS_API_URL}
