@@ -1,5 +1,6 @@
 package uk.gov.justice.laa.cwa.bulkupload.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
@@ -12,15 +13,10 @@ import uk.gov.justice.laa.cwa.bulkupload.response.UploadResponseDto;
  * Service class for performing virus check.
  */
 @Service
+@RequiredArgsConstructor
 public class VirusCheckService {
     private final RestClient restClient;
     private final TokenService tokenService;
-
-
-    public VirusCheckService(RestClient restClient, TokenService tokenService) {
-        this.restClient = restClient;
-        this.tokenService = tokenService;
-    }
 
     /**
      * Perform a virus check for the given file.
@@ -35,7 +31,7 @@ public class VirusCheckService {
         return restClient.put()
                 .uri("/virus_check_file")
                 .contentType(MediaType.MULTIPART_FORM_DATA)
-                .header("Authorization", "Bearer " + tokenService.getAccessToken())
+                .header("Authorization", "Bearer " + tokenService.getSdsAccessToken())
                 .body(body)
                 .retrieve()
                 .body(UploadResponseDto.class);

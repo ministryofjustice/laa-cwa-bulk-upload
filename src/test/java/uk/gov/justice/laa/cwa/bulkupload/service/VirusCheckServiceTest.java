@@ -1,5 +1,5 @@
 
-package uk.gov.justice.laa.cwa.bulkupload.controller;
+package uk.gov.justice.laa.cwa.bulkupload.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,8 +12,6 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
 import uk.gov.justice.laa.cwa.bulkupload.response.UploadResponseDto;
-import uk.gov.justice.laa.cwa.bulkupload.service.TokenService;
-import uk.gov.justice.laa.cwa.bulkupload.service.VirusCheckService;
 
 import java.io.IOException;
 
@@ -56,7 +54,7 @@ class VirusCheckServiceTest {
         RestClient.RequestBodySpec requestBodySpec = mock(RestClient.RequestBodySpec.class);
         RestClient.ResponseSpec responseSpec = mock(RestClient.ResponseSpec.class);
 
-        when(tokenService.getAccessToken()).thenReturn(mockToken);
+        when(tokenService.getSdsAccessToken()).thenReturn(mockToken);
         when(restClient.put()).thenReturn(requestBodyUriSpec);
         when(requestBodyUriSpec.uri("/virus_check_file")).thenReturn(requestBodySpec);
         when(requestBodySpec.contentType(MediaType.MULTIPART_FORM_DATA)).thenReturn(requestBodySpec);
@@ -96,7 +94,7 @@ class VirusCheckServiceTest {
         RestClient.RequestBodyUriSpec requestBodyUriSpec = mock(RestClient.RequestBodyUriSpec.class);
         RestClient.RequestBodySpec requestBodySpec = mock(RestClient.RequestBodySpec.class);
 
-        when(tokenService.getAccessToken()).thenReturn("mock-token");
+        when(tokenService.getSdsAccessToken()).thenReturn("mock-token");
         when(restClient.put()).thenReturn(requestBodyUriSpec);
         when(requestBodyUriSpec.uri("/virus_check_file")).thenReturn(requestBodySpec);
         when(requestBodySpec.contentType(any())).thenReturn(requestBodySpec);
@@ -124,7 +122,7 @@ class VirusCheckServiceTest {
         RestClient.RequestBodyUriSpec requestBodyUriSpec = mock(RestClient.RequestBodyUriSpec.class);
         RestClient.RequestBodySpec requestBodySpec = mock(RestClient.RequestBodySpec.class);
 
-        when(tokenService.getAccessToken()).thenReturn("mock-token");
+        when(tokenService.getSdsAccessToken()).thenReturn("mock-token");
         when(restClient.put()).thenReturn(requestBodyUriSpec);
         when(requestBodyUriSpec.uri("/virus_check_file")).thenReturn(requestBodySpec);
         when(requestBodySpec.contentType(any())).thenReturn(requestBodySpec);
