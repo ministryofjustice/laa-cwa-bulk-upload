@@ -9,6 +9,9 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 
+/**
+ * Service class for getting an access token.
+ */
 @Service
 public class TokenService {
 
@@ -20,6 +23,11 @@ public class TokenService {
         this.authorizedClientManager = authorizedClientManager;
     }
 
+    /**
+     * Get access token.
+     *
+     * @return the access token
+     */
     public String getAccessToken() {
         if (accessToken != null && accessToken.getExpiresAt() != null
                 && accessToken.getExpiresAt().isAfter(Instant.now().plusSeconds(60))) {

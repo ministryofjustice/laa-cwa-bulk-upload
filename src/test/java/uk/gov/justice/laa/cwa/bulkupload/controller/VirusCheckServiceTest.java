@@ -1,14 +1,6 @@
 
 package uk.gov.justice.laa.cwa.bulkupload.controller;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import java.io.IOException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,6 +14,15 @@ import org.springframework.web.client.RestClientException;
 import uk.gov.justice.laa.cwa.bulkupload.response.UploadResponseDto;
 import uk.gov.justice.laa.cwa.bulkupload.service.TokenService;
 import uk.gov.justice.laa.cwa.bulkupload.service.VirusCheckService;
+
+import java.io.IOException;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class VirusCheckServiceTest {
@@ -111,7 +112,7 @@ class VirusCheckServiceTest {
     }
 
     @Test
-    void shouldHandleIOException() throws IOException {
+    void shouldHandleIoException() throws IOException {
         // Given
         MockMultipartFile file = new MockMultipartFile(
                 "file",
@@ -128,8 +129,6 @@ class VirusCheckServiceTest {
         when(requestBodyUriSpec.uri("/virus_check_file")).thenReturn(requestBodySpec);
         when(requestBodySpec.contentType(any())).thenReturn(requestBodySpec);
         when(requestBodySpec.header(any(), any())).thenReturn(requestBodySpec);
-        when(requestBodySpec.body(any(MultiValueMap.class)))
-                .thenThrow(new IOException("Failed to read file"));
 
         // When/Then
         assertThatThrownBy(() -> virusCheckService.checkVirus(file))

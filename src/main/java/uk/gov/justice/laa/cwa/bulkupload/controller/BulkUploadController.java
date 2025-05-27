@@ -42,8 +42,8 @@ public class BulkUploadController {
             return "pages/upload-failure";
         }
         try {
-            UploadResponseDto UploadResponseDto = virusCheckService.checkVirus(file);
-            System.out.println("UploadResponseDto :: " + UploadResponseDto.getDetail());
+            UploadResponseDto uploadResponseDto = virusCheckService.checkVirus(file);
+            System.out.println("UploadResponseDto :: " + uploadResponseDto.getDetail());
         } catch (Exception e) {
             e.printStackTrace();
         }

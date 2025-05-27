@@ -15,6 +15,9 @@ import org.springframework.security.oauth2.client.registration.ClientRegistratio
 import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 
+/**
+ * Entra Id config for the application.
+ */
 @Profile("!test") // disable security for test profile
 @Configuration
 public class EntraIdConfig {
@@ -35,16 +38,25 @@ public class EntraIdConfig {
     private String cloudInstance;
 
 
+    /**
+     * Client registration repository.
+     */
     @Bean
     public ClientRegistrationRepository clientRegistrationRepository() {
         return new InMemoryClientRegistrationRepository(clientRegistration());
     }
 
+    /**
+     * OAuth client service.
+     */
     @Bean
     public OAuth2AuthorizedClientService authorizedClientService(ClientRegistrationRepository clientRegistrationRepository) {
         return new InMemoryOAuth2AuthorizedClientService(clientRegistrationRepository);
     }
 
+    /**
+     * OAuth Client manager.
+     */
     @Bean
     public OAuth2AuthorizedClientManager authorizedClientManager(ClientRegistrationRepository clientRegistrationRepository,
                                                                  OAuth2AuthorizedClientService authorizedClientService) {

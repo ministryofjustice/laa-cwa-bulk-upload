@@ -7,16 +7,18 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import uk.gov.justice.laa.cwa.bulkupload.response.UploadResponseDto;
 import uk.gov.justice.laa.cwa.bulkupload.service.TokenService;
 import uk.gov.justice.laa.cwa.bulkupload.service.VirusCheckService;
-import uk.gov.justice.laa.cwa.bulkupload.response.UploadResponseDto;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
 @WebMvcTest(BulkUploadController.class)
 @AutoConfigureMockMvc(addFilters = false)
@@ -41,12 +43,8 @@ class BulkUploadControllerTest {
 
     @Test
     void shouldUploadFile() throws Exception {
-        MockMultipartFile uploadFile = new MockMultipartFile(
-                "fileUpload",
-                "test.pdf",
-                "application/pdf",
-                "test content".getBytes()
-        );
+
+        MockMultipartFile uploadFile = new MockMultipartFile("fileUpload", "test.pdf", "text/plain", "test".getBytes());
 
         when(virusCheckService.checkVirus(any()))
                 .thenReturn(new UploadResponseDto());

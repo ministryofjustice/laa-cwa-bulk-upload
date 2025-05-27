@@ -8,8 +8,9 @@ import org.springframework.web.client.RestClient;
 import org.springframework.web.multipart.MultipartFile;
 import uk.gov.justice.laa.cwa.bulkupload.response.UploadResponseDto;
 
-import java.io.IOException;
-
+/**
+ * Service class for performing virus check.
+ */
 @Service
 public class VirusCheckService {
     private final RestClient restClient;
@@ -21,8 +22,13 @@ public class VirusCheckService {
         this.tokenService = tokenService;
     }
 
-    // POST request example
-    public UploadResponseDto checkVirus(MultipartFile file) throws IOException {
+    /**
+     * Perform a virus check for the given file.
+     *
+     * @param file the file
+     * @return the result
+     */
+    public UploadResponseDto checkVirus(MultipartFile file) {
         MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
         body.add("file", file.getResource());
 
