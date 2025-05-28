@@ -25,6 +25,10 @@ public class VirusCheckService {
      * @return the result
      */
     public UploadResponseDto checkVirus(MultipartFile file) {
+        if (file == null) {
+            throw new IllegalArgumentException("File cannot be null");
+        }
+
         MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
         body.add("file", file.getResource());
 

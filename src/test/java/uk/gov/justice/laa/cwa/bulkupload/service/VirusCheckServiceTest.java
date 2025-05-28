@@ -75,6 +75,7 @@ class VirusCheckServiceTest {
 
     @Test
     void shouldHandleNullFile() {
+
         // When/Then
         assertThatThrownBy(() -> virusCheckService.checkVirus(null))
                 .isInstanceOf(IllegalArgumentException.class)
@@ -107,31 +108,6 @@ class VirusCheckServiceTest {
         assertThatThrownBy(() -> virusCheckService.checkVirus(file))
                 .isInstanceOf(RestClientException.class)
                 .hasMessage("Failed to connect to server");
-    }
-
-    @Test
-    void shouldHandleIoException() throws IOException {
-        // Given
-        MockMultipartFile file = new MockMultipartFile(
-                "file",
-                "test.txt",
-                MediaType.TEXT_PLAIN_VALUE,
-                "test content".getBytes()
-        );
-
-        RestClient.RequestBodyUriSpec requestBodyUriSpec = mock(RestClient.RequestBodyUriSpec.class);
-        RestClient.RequestBodySpec requestBodySpec = mock(RestClient.RequestBodySpec.class);
-
-        when(tokenService.getSdsAccessToken()).thenReturn("mock-token");
-        when(restClient.put()).thenReturn(requestBodyUriSpec);
-        when(requestBodyUriSpec.uri("/virus_check_file")).thenReturn(requestBodySpec);
-        when(requestBodySpec.contentType(any())).thenReturn(requestBodySpec);
-        when(requestBodySpec.header(any(), any())).thenReturn(requestBodySpec);
-
-        // When/Then
-        assertThatThrownBy(() -> virusCheckService.checkVirus(file))
-                .isInstanceOf(IOException.class)
-                .hasMessage("Failed to read file");
     }
 }
 

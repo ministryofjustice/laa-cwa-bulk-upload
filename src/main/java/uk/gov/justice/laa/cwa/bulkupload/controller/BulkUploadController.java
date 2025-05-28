@@ -43,7 +43,7 @@ public class BulkUploadController {
         }
         try {
             UploadResponseDto uploadResponseDto = virusCheckService.checkVirus(file);
-            log.info("UploadResponseDto :: {}", uploadResponseDto.getDetail());
+            log.info("UploadResponseDto :: {}", uploadResponseDto);
         } catch (Exception e) {
             log.error("Exception", e);
         }
