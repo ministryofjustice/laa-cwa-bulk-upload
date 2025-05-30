@@ -20,8 +20,6 @@ jobs:
       - test
     env:
       SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-      SNYK_TEST_EXCLUDE: build,generated
-      SNYK_TARGET_REFERENCE: main
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v4
