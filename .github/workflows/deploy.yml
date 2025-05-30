@@ -81,11 +81,10 @@ jobs:
 
   vulnerability-report:
     runs-on: ubuntu-latest
+    needs: ecr
     permissions:
       id-token: write
       security-events: write # for github/codeql-action/upload-sarif to upload SARIF results
-    needs:
-      - deploy-prod
     env:
       SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
       SNYK_ORG: legal-aid-agency
