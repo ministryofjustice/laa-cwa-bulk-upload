@@ -1,4 +1,4 @@
-name: Build and deploy
+name: PR merge and deploy
 
 on:
   push:
@@ -85,17 +85,18 @@ jobs:
       id-token: write
     needs:
       - deploy-prod
+    env:
+      SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
     steps:
       - uses: actions/checkout@v4
 
       - name: Setup Snyk Monitor checks for Java app vulnerabilities
         uses: snyk/actions/gradle@master
         continue-on-error: true # To make sure that further actions are called (e.g. SARIF upload)
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
           command: monitor
           args: --all-sub-projects --severity-threshold=high
+
       - name: Generate sarif Snyk report
         uses: snyk/actions/gradle@master
         continue-on-error: true
@@ -131,7 +132,6 @@ jobs:
         uses: snyk/actions/docker@master
         continue-on-error: true # To make sure that further actions are called (e.g. monitor or SARIF upload)
         env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           REPOSITORY: ${{ vars.ECR_REPOSITORY }}
           IMAGE_TAG: ${{ github.sha }}
