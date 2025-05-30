@@ -3,7 +3,6 @@ package uk.gov.justice.laa.cwa.bulkupload.config;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
 import org.springframework.security.oauth2.client.AuthorizedClientServiceOAuth2AuthorizedClientManager;
 import org.springframework.security.oauth2.client.InMemoryOAuth2AuthorizedClientService;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager;
@@ -18,7 +17,6 @@ import org.springframework.security.oauth2.core.AuthorizationGrantType;
 /**
  * Entra Id config for the application.
  */
-@Profile("!test") // disable security for test profile
 @Configuration
 public class EntraIdConfig {
 
