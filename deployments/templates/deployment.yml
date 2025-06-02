@@ -29,6 +29,12 @@ spec:
             runAsNonRoot: true
             runAsUser: 1001
           env:
+            - name: AUTH_APP_ID
+              valueFrom:
+                secretKeyRef:
+                  name: cwa-bulk-upload-secrets
+                  key: AUTH_APP_ID
+
             - name: AUTH_CLIENT_ID
               valueFrom:
                 secretKeyRef:
@@ -43,6 +49,12 @@ spec:
 
             - name: AUTH_CLOUD_INSTANCE
               value : https://login.microsoftonline.com
+
+            - name: AUTH_SAML_ENTITY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: cwa-bulk-upload-secrets
+                  key: AUTH_SCOPE
 
             - name: AUTH_SCOPE
               valueFrom:

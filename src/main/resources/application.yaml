@@ -26,7 +26,7 @@ spring:
             entity-id: ${AUTH_SAML_ENTITY_ID}
             assertingparty:
               entity-id: https://sts.windows.net/${AUTH_TENANT_ID}/
-              metadata-uri: ${AUTH_CLOUD_INSTANCE}/${AUTH_TENANT_ID}/federationmetadata/2007-06/federationmetadata.xml?appid=${SSO_APP_ID}
+              metadata-uri: ${AUTH_CLOUD_INSTANCE}/${AUTH_TENANT_ID}/federationmetadata/2007-06/federationmetadata.xml?appid=${AUTH_APP_ID}
               singlesignon:
                 url: ${AUTH_CLOUD_INSTANCE}/${AUTH_TENANT_ID}/saml2
               verification:
