@@ -18,6 +18,8 @@ import java.util.List;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
@@ -72,6 +74,30 @@ class BulkUploadControllerTest {
                         .file(uploadFile))
                 .andExpect(status().isOk())
                 .andExpect(view().name("pages/upload-success"));
+    }
+
+    @Test
+    void shouldNotUploadFileAndReturnErrorPage() throws Exception {
+
+        MockMultipartFile uploadFile = new MockMultipartFile("fileUpload", "test.pdf", "text/plain", "test".getBytes());
+
+        when(virusCheckService.checkVirus(any()))
+                .thenReturn(new VirusCheckResponseDto());
+
+        // Mock CwaUploadService and its methods
+        CwaUploadResponseDto uploadResponse = new CwaUploadResponseDto();
+        uploadResponse.setFileId("file123");
+        when(cwaUploadService.uploadFile(any(), any(), any())).thenReturn(uploadResponse);
+
+        ValidateResponseDto validateResponse = new ValidateResponseDto();
+        validateResponse.setStatus("failure");
+        when(cwaUploadService.validate(any(), any())).thenReturn(validateResponse);
+
+        mockMvc.perform(multipart("/upload")
+                        .file(uploadFile))
+                .andExpect(view().name("pages/upload-failure"));
+
+        verify(cwaUploadService, never()).getUploadSummary(any());
     }
 
     @Test

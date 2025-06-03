@@ -110,5 +110,6 @@ class CwaUploadServiceTest {
                 .isInstanceOf(RestClientException.class)
                 .hasMessage("Failed to connect to server");
     }
+
 }
 

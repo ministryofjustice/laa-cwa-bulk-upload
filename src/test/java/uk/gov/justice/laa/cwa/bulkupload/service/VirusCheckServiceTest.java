@@ -42,12 +42,6 @@ class VirusCheckServiceTest {
     @Test
     void shouldSuccessfullyCheckVirusInFile() throws IOException {
         // Given
-        MockMultipartFile file = new MockMultipartFile(
-                "file",
-                "test.txt",
-                MediaType.TEXT_PLAIN_VALUE,
-                "test content".getBytes()
-        );
         String mockToken = "mock-token";
         VirusCheckResponseDto expectedResponse = new VirusCheckResponseDto();
         expectedResponse.setSuccess("success");
@@ -64,6 +58,13 @@ class VirusCheckServiceTest {
         when(requestBodySpec.body(any(MultiValueMap.class))).thenReturn(requestBodySpec);
         when(requestBodySpec.retrieve()).thenReturn(responseSpec);
         when(responseSpec.body(VirusCheckResponseDto.class)).thenReturn(expectedResponse);
+
+        MockMultipartFile file = new MockMultipartFile(
+                "file",
+                "test.txt",
+                MediaType.TEXT_PLAIN_VALUE,
+                "test content".getBytes()
+        );
 
         // When
         VirusCheckResponseDto result = virusCheckService.checkVirus(file);
