@@ -12,8 +12,9 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
 import uk.gov.justice.laa.cwa.bulkupload.response.CwaUploadResponseDto;
+import uk.gov.justice.laa.cwa.bulkupload.response.ValidateResponseDto;
 
-import java.io.IOException;
+import java.util.function.Function;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -40,7 +41,7 @@ class CwaUploadServiceTest {
     }
 
     @Test
-    void shouldSuccessfullyCheckVirusInFile() throws IOException {
+    void shouldSuccessfullyCheckVirusInFile() {
         // Given
         MockMultipartFile file = new MockMultipartFile(
                 "file",
@@ -84,7 +85,7 @@ class CwaUploadServiceTest {
     }
 
     @Test
-    void shouldHandleRestClientException() throws IOException {
+    void shouldHandleRestClientException() {
         // Given
         MockMultipartFile file = new MockMultipartFile(
                 "file",
@@ -110,6 +111,34 @@ class CwaUploadServiceTest {
                 .isInstanceOf(RestClientException.class)
                 .hasMessage("Failed to connect to server");
     }
+
+    @Test
+    void shouldValidateFileSuccessfully() {
+        // Given
+        String fileId = "file-123";
+        String userName = "test-user";
+        ValidateResponseDto expectedResponse = new ValidateResponseDto();
+
+        RestClient.RequestBodyUriSpec requestBodyUriSpec = mock(RestClient.RequestBodyUriSpec.class);
+        RestClient.RequestBodySpec requestBodySpec = mock(RestClient.RequestBodySpec.class);
+        RestClient.ResponseSpec responseSpec = mock(RestClient.ResponseSpec.class);
+
+        when(tokenService.getSdsAccessToken()).thenReturn("mock-token");
+        when(restClient.post()).thenReturn(requestBodyUriSpec);
+        when(requestBodyUriSpec.uri(endsWith("/validate"), any(Function.class))).thenReturn(requestBodySpec);
+        when(requestBodySpec.header(any(), any())).thenReturn(requestBodySpec);
+        when(requestBodySpec.retrieve()).thenReturn(responseSpec);
+        when(responseSpec.body(ValidateResponseDto.class)).thenReturn(expectedResponse);
+
+        // When
+        ValidateResponseDto result = cwaUploadService.validate(fileId, userName);
+
+        // Then
+        assertThat(result).isEqualTo(expectedResponse);
+        verify(requestBodySpec).header("Authorization", "Bearer mock-token");
+        verify(requestBodySpec).retrieve();
+    }
+
 
 }
 

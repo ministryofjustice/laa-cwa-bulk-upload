@@ -66,7 +66,7 @@ public class CwaUploadService {
                         .build())
                 .header("Authorization", "Bearer " + tokenService.getSdsAccessToken())
                 .retrieve()
-                .body(new ParameterizedTypeReference<List<VendorDto>>() {
+                .body(new ParameterizedTypeReference<>() {
                 });
 
     }
@@ -103,7 +103,7 @@ public class CwaUploadService {
                         .build())
                 .header("Authorization", "Bearer " + tokenService.getSdsAccessToken())
                 .retrieve()
-                .body(new ParameterizedTypeReference<List<CwaUploadSummaryResponseDto>>() {
+                .body(new ParameterizedTypeReference<>() {
                 });
 
     }
@@ -121,7 +121,7 @@ public class CwaUploadService {
                         .build())
                 .header("Authorization", "Bearer " + tokenService.getSdsAccessToken())
                 .retrieve()
-                .body(new ParameterizedTypeReference<List<CwaUploadErrorResponseDto>>() {
+                .body(new ParameterizedTypeReference<>() {
                 });
 
     }
