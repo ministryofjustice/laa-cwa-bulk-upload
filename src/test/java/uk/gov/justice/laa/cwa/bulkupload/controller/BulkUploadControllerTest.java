@@ -7,9 +7,14 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import uk.gov.justice.laa.cwa.bulkupload.response.CwaUploadResponseDto;
+import uk.gov.justice.laa.cwa.bulkupload.response.ValidateResponseDto;
 import uk.gov.justice.laa.cwa.bulkupload.response.VirusCheckResponseDto;
+import uk.gov.justice.laa.cwa.bulkupload.service.CwaUploadService;
 import uk.gov.justice.laa.cwa.bulkupload.service.TokenService;
 import uk.gov.justice.laa.cwa.bulkupload.service.VirusCheckService;
+
+import java.util.List;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.any;
@@ -31,6 +36,9 @@ class BulkUploadControllerTest {
     private VirusCheckService virusCheckService;
 
     @MockitoBean
+    private CwaUploadService cwaUploadService;
+
+    @MockitoBean
     private TokenService tokenService;  // Added TokenService mock
 
     @Test
@@ -48,6 +56,17 @@ class BulkUploadControllerTest {
 
         when(virusCheckService.checkVirus(any()))
                 .thenReturn(new VirusCheckResponseDto());
+
+        // Mock CwaUploadService and its methods
+        CwaUploadResponseDto uploadResponse = new CwaUploadResponseDto();
+        uploadResponse.setFileId("file123");
+        when(cwaUploadService.uploadFile(any(), any(), any())).thenReturn(uploadResponse);
+
+        ValidateResponseDto validateResponse = new ValidateResponseDto();
+        validateResponse.setStatus("success");
+        when(cwaUploadService.validate(any(), any())).thenReturn(validateResponse);
+
+        when(cwaUploadService.getUploadSummary(any())).thenReturn(List.of());
 
         mockMvc.perform(multipart("/upload")
                         .file(uploadFile))

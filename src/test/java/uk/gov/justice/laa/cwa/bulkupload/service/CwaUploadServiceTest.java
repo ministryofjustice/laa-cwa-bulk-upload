@@ -11,7 +11,7 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
-import uk.gov.justice.laa.cwa.bulkupload.response.UploadResponseDto;
+import uk.gov.justice.laa.cwa.bulkupload.response.CwaUploadResponseDto;
 
 import java.io.IOException;
 
@@ -49,7 +49,7 @@ class CwaUploadServiceTest {
                 "test content".getBytes()
         );
         String mockToken = "mock-token";
-        UploadResponseDto expectedResponse = new UploadResponseDto();
+        CwaUploadResponseDto expectedResponse = new CwaUploadResponseDto();
 
         RestClient.RequestBodyUriSpec requestBodyUriSpec = mock(RestClient.RequestBodyUriSpec.class);
         RestClient.RequestBodySpec requestBodySpec = mock(RestClient.RequestBodySpec.class);
@@ -62,10 +62,10 @@ class CwaUploadServiceTest {
         when(requestBodySpec.header("Authorization", "Bearer " + mockToken)).thenReturn(requestBodySpec);
         when(requestBodySpec.body(any(MultiValueMap.class))).thenReturn(requestBodySpec);
         when(requestBodySpec.retrieve()).thenReturn(responseSpec);
-        when(responseSpec.body(UploadResponseDto.class)).thenReturn(expectedResponse);
+        when(responseSpec.body(CwaUploadResponseDto.class)).thenReturn(expectedResponse);
 
         // When
-        UploadResponseDto result = cwaUploadService.uploadFile(file);
+        CwaUploadResponseDto result = cwaUploadService.uploadFile(file, "test-provider", "test-user");
 
         // Then
         assertThat(result).isEqualTo(expectedResponse);
@@ -78,7 +78,7 @@ class CwaUploadServiceTest {
     void shouldHandleNullFile() {
 
         // When/Then
-        assertThatThrownBy(() -> cwaUploadService.uploadFile(null))
+        assertThatThrownBy(() -> cwaUploadService.uploadFile(null, "test-provider", "test-user"))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("File cannot be null");
     }
@@ -106,7 +106,7 @@ class CwaUploadServiceTest {
                 .thenThrow(new RestClientException("Failed to connect to server"));
 
         // When/Then
-        assertThatThrownBy(() -> cwaUploadService.uploadFile(file))
+        assertThatThrownBy(() -> cwaUploadService.uploadFile(file, "test-provider", "test-user"))
                 .isInstanceOf(RestClientException.class)
                 .hasMessage("Failed to connect to server");
     }

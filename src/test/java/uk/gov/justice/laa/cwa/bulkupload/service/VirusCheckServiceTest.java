@@ -60,7 +60,7 @@ class VirusCheckServiceTest {
         when(requestBodyUriSpec.uri(endsWith("/virus_check_file"))).thenReturn(requestBodySpec);
         when(requestBodySpec.contentType(MediaType.MULTIPART_FORM_DATA)).thenReturn(requestBodySpec);
         when(requestBodySpec.header("Authorization", "Bearer " + mockToken)).thenReturn(requestBodySpec);
-        when(requestBodySpec.body(any(MultiValueMap.class))).thenReturn(requestBodySpec);
+        when(requestBodySpec.body(any())).thenReturn(requestBodySpec);
         when(requestBodySpec.retrieve()).thenReturn(responseSpec);
         when(responseSpec.body(VirusCheckResponseDto.class)).thenReturn(expectedResponse);
 
@@ -71,7 +71,7 @@ class VirusCheckServiceTest {
         assertThat(result).isEqualTo(expectedResponse);
         verify(requestBodySpec).contentType(MediaType.MULTIPART_FORM_DATA);
         verify(requestBodySpec).header("Authorization", "Bearer " + mockToken);
-        verify(requestBodySpec).body(any(MultiValueMap.class));
+        verify(requestBodySpec).body(any());
     }
 
     @Test
