@@ -7,7 +7,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import uk.gov.justice.laa.cwa.bulkupload.response.UploadResponseDto;
+import uk.gov.justice.laa.cwa.bulkupload.response.VirusCheckResponseDto;
 import uk.gov.justice.laa.cwa.bulkupload.service.TokenService;
 import uk.gov.justice.laa.cwa.bulkupload.service.VirusCheckService;
 
@@ -47,7 +47,7 @@ class BulkUploadControllerTest {
         MockMultipartFile uploadFile = new MockMultipartFile("fileUpload", "test.pdf", "text/plain", "test".getBytes());
 
         when(virusCheckService.checkVirus(any()))
-                .thenReturn(new UploadResponseDto());
+                .thenReturn(new VirusCheckResponseDto());
 
         mockMvc.perform(multipart("/upload")
                         .file(uploadFile))

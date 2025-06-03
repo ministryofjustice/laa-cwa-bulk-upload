@@ -12,3 +12,6 @@ azure:
 
 sds-api:
   url: xx
+
+cwa-api:
+  url: xx

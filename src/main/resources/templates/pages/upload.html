@@ -10,6 +10,15 @@
                 <div class="govuk-grid-column-two-thirds">
                     <h1 class="govuk-heading-xl">CWA Bulk Upload</h1>
                     <div class="govuk-form-group">
+                        <label class="govuk-label" for="provider">
+                            Sort by
+                        </label>
+                        <select class="govuk-select" id="provider" name="provider">
+                            <option value="0">select option</option>
+                            <option th:each="provider : ${providers}" th:value="${provider.vendorId}" th:text="${provider.vendorName}"></option>
+                        </select>
+                    </div>
+                    <div class="govuk-form-group">
                         <label class="govuk-label" for="file-upload">Select a file to upload</label>
                         <input class="govuk-file-upload" id="file-upload" name="fileUpload" type="file">
                     </div>

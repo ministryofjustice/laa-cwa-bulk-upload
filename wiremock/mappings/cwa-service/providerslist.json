@@ -1,0 +1,27 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPath": "/get_providers",
+    "queryParameters": {
+      "username": {
+        "equalTo": "TestUser"
+      }
+    }
+  },
+  "response": {
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "status": 200,
+    "jsonBody": [
+                {
+                  "VENDOR_NAME": "ABC Solicitors",
+                  "VENDOR_ID": 1
+                },
+                {
+                  "VENDOR_NAME": "XYZ Solicitors",
+                  "VENDOR_ID": 2
+                }
+    ]
+  }
+}

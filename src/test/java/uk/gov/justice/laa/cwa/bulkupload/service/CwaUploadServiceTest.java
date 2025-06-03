@@ -11,7 +11,7 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
-import uk.gov.justice.laa.cwa.bulkupload.response.VirusCheckResponseDto;
+import uk.gov.justice.laa.cwa.bulkupload.response.UploadResponseDto;
 
 import java.io.IOException;
 
@@ -24,7 +24,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class VirusCheckServiceTest {
+class CwaUploadServiceTest {
 
     @Mock
     private RestClient restClient;
@@ -32,11 +32,11 @@ class VirusCheckServiceTest {
     @Mock
     private TokenService tokenService;
 
-    private VirusCheckService virusCheckService;
+    private CwaUploadService cwaUploadService;
 
     @BeforeEach
     void setUp() {
-        virusCheckService = new VirusCheckService(restClient, tokenService);
+        cwaUploadService = new CwaUploadService(restClient, tokenService);
     }
 
     @Test
@@ -49,23 +49,23 @@ class VirusCheckServiceTest {
                 "test content".getBytes()
         );
         String mockToken = "mock-token";
-        VirusCheckResponseDto expectedResponse = new VirusCheckResponseDto();
+        UploadResponseDto expectedResponse = new UploadResponseDto();
 
         RestClient.RequestBodyUriSpec requestBodyUriSpec = mock(RestClient.RequestBodyUriSpec.class);
         RestClient.RequestBodySpec requestBodySpec = mock(RestClient.RequestBodySpec.class);
         RestClient.ResponseSpec responseSpec = mock(RestClient.ResponseSpec.class);
 
         when(tokenService.getSdsAccessToken()).thenReturn(mockToken);
-        when(restClient.put()).thenReturn(requestBodyUriSpec);
-        when(requestBodyUriSpec.uri(endsWith("/virus_check_file"))).thenReturn(requestBodySpec);
+        when(restClient.post()).thenReturn(requestBodyUriSpec);
+        when(requestBodyUriSpec.uri(endsWith("/upload"))).thenReturn(requestBodySpec);
         when(requestBodySpec.contentType(MediaType.MULTIPART_FORM_DATA)).thenReturn(requestBodySpec);
         when(requestBodySpec.header("Authorization", "Bearer " + mockToken)).thenReturn(requestBodySpec);
         when(requestBodySpec.body(any(MultiValueMap.class))).thenReturn(requestBodySpec);
         when(requestBodySpec.retrieve()).thenReturn(responseSpec);
-        when(responseSpec.body(VirusCheckResponseDto.class)).thenReturn(expectedResponse);
+        when(responseSpec.body(UploadResponseDto.class)).thenReturn(expectedResponse);
 
         // When
-        VirusCheckResponseDto result = virusCheckService.checkVirus(file);
+        UploadResponseDto result = cwaUploadService.uploadFile(file);
 
         // Then
         assertThat(result).isEqualTo(expectedResponse);
@@ -78,7 +78,7 @@ class VirusCheckServiceTest {
     void shouldHandleNullFile() {
 
         // When/Then
-        assertThatThrownBy(() -> virusCheckService.checkVirus(null))
+        assertThatThrownBy(() -> cwaUploadService.uploadFile(null))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("File cannot be null");
     }
@@ -97,8 +97,8 @@ class VirusCheckServiceTest {
         RestClient.RequestBodySpec requestBodySpec = mock(RestClient.RequestBodySpec.class);
 
         when(tokenService.getSdsAccessToken()).thenReturn("mock-token");
-        when(restClient.put()).thenReturn(requestBodyUriSpec);
-        when(requestBodyUriSpec.uri(endsWith("/virus_check_file"))).thenReturn(requestBodySpec);
+        when(restClient.post()).thenReturn(requestBodyUriSpec);
+        when(requestBodyUriSpec.uri(endsWith("/upload"))).thenReturn(requestBodySpec);
         when(requestBodySpec.contentType(any())).thenReturn(requestBodySpec);
         when(requestBodySpec.header(any(), any())).thenReturn(requestBodySpec);
         when(requestBodySpec.body(any(MultiValueMap.class))).thenReturn(requestBodySpec);
@@ -106,7 +106,7 @@ class VirusCheckServiceTest {
                 .thenThrow(new RestClientException("Failed to connect to server"));
 
         // When/Then
-        assertThatThrownBy(() -> virusCheckService.checkVirus(file))
+        assertThatThrownBy(() -> cwaUploadService.uploadFile(file))
                 .isInstanceOf(RestClientException.class)
                 .hasMessage("Failed to connect to server");
     }
