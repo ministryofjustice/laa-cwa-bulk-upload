@@ -37,7 +37,7 @@ public class BulkUploadController {
     @GetMapping("/")
     public String showUploadPage(Model model) {
         List<VendorDto> providers = cwaUploadService.getProviders("TestUser");
-        model.addAttribute("providers",providers);
+        model.addAttribute("providers", providers);
         return "pages/upload";
     }
 
@@ -54,10 +54,10 @@ public class BulkUploadController {
         }
         try {
             virusCheckService.checkVirus(file);
-            CwaUploadResponseDto cwaUploadResponseDto = cwaUploadService.uploadFile(file, provider,"TestUser" );
-            ValidateResponseDto validateResponseDto = cwaUploadService.validate(cwaUploadResponseDto.getFileId(),"TestUser");
+            CwaUploadResponseDto cwaUploadResponseDto = cwaUploadService.uploadFile(file, provider, "TestUser");
+            ValidateResponseDto validateResponseDto = cwaUploadService.validate(cwaUploadResponseDto.getFileId(), "TestUser");
             if (validateResponseDto.getStatus().equals("failure")) {
-                List<CwaUploadErrorResponseDto> errors  = cwaUploadService.getUploadErrors(cwaUploadResponseDto.getFileId());
+                List<CwaUploadErrorResponseDto> errors = cwaUploadService.getUploadErrors(cwaUploadResponseDto.getFileId());
                 log.error("Validation failed: {}", validateResponseDto.getMessage());
                 return "pages/upload-failure";
             }
@@ -68,6 +68,6 @@ public class BulkUploadController {
             log.error("Exception", e);
         }
 
-            return "pages/upload-success";
+        return "pages/upload-success";
     }
 }

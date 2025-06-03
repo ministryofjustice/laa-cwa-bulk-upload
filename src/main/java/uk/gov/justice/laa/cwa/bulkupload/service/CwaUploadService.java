@@ -13,6 +13,7 @@ import uk.gov.justice.laa.cwa.bulkupload.response.CwaUploadResponseDto;
 import uk.gov.justice.laa.cwa.bulkupload.response.CwaUploadSummaryResponseDto;
 import uk.gov.justice.laa.cwa.bulkupload.response.ValidateResponseDto;
 import uk.gov.justice.laa.cwa.bulkupload.response.VendorDto;
+
 import java.util.List;
 
 /**
@@ -54,7 +55,8 @@ public class CwaUploadService {
 
     /**
      * Retrieves the list of providers from CWA.
-     * @param userName
+     *
+     * @param userName for which providers are to be fetched
      * @return List of VendorDto
      */
     public List<VendorDto> getProviders(String userName) {
@@ -64,15 +66,17 @@ public class CwaUploadService {
                         .build())
                 .header("Authorization", "Bearer " + tokenService.getSdsAccessToken())
                 .retrieve()
-                .body(new ParameterizedTypeReference<List<VendorDto>>() {});
+                .body(new ParameterizedTypeReference<List<VendorDto>>() {
+                });
 
     }
 
     /**
      * Validates the file at CWA.
-     * @param fileId
-     * @param userName
-     * @return
+     *
+     * @param fileId the ID of the file to be validated
+     * @param userName the user who is validating the file
+     * @return ValidateResponseDto containing validation results
      */
     public ValidateResponseDto validate(String fileId, String userName) {
         return restClient.post()
@@ -88,8 +92,9 @@ public class CwaUploadService {
 
     /**
      * Retrieves the upload summary from CWA.
-     * @param fileId
-     * @return
+     *
+     * @param fileId the ID of the file for which summary is to be fetched
+     * @return List of CwaUploadSummaryResponseDto containing the upload summary
      */
     public List<CwaUploadSummaryResponseDto> getUploadSummary(String fileId) {
         return restClient.get()
@@ -98,14 +103,16 @@ public class CwaUploadService {
                         .build())
                 .header("Authorization", "Bearer " + tokenService.getSdsAccessToken())
                 .retrieve()
-                .body(new ParameterizedTypeReference<List<CwaUploadSummaryResponseDto>>() {});
+                .body(new ParameterizedTypeReference<List<CwaUploadSummaryResponseDto>>() {
+                });
 
     }
 
     /**
      * Retrieves the upload errors from CWA.
-     * @param fileId
-     * @return
+     *
+     * @param fileId the ID of the file for which errors are to be fetched
+     * @return List of CwaUploadErrorResponseDto containing the upload errors
      */
     public List<CwaUploadErrorResponseDto> getUploadErrors(String fileId) {
         return restClient.get()
@@ -114,9 +121,8 @@ public class CwaUploadService {
                         .build())
                 .header("Authorization", "Bearer " + tokenService.getSdsAccessToken())
                 .retrieve()
-                .body(new ParameterizedTypeReference<List<CwaUploadErrorResponseDto>>() {});
+                .body(new ParameterizedTypeReference<List<CwaUploadErrorResponseDto>>() {
+                });
 
     }
-
-
 }

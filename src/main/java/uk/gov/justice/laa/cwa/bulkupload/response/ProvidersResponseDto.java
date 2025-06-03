@@ -9,5 +9,5 @@ import java.util.List;
  */
 @Data
 public class ProvidersResponseDto {
-    private List <VendorDto> providers;
+    private List<VendorDto> providers;
 }
