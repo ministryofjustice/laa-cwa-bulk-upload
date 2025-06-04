@@ -3,10 +3,14 @@ package uk.gov.justice.laa.cwa.bulkupload.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PostMapping;
 import uk.gov.justice.laa.cwa.bulkupload.response.SubmissionResponseDto;
 import uk.gov.justice.laa.cwa.bulkupload.service.CwaUploadService;
-import org.springframework.ui.Model;
+
+/**
+ * Controller for handling the submission of bulk upload.
+ */
 
 @Slf4j
 @RequiredArgsConstructor

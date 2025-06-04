@@ -129,9 +129,10 @@ public class CwaUploadService {
 
     /**
      * Submits the file for processing in CWA.
-     * @param fileId
-     * @param userName
-     * @return
+     *
+     * @param fileId the ID of the file to be submitted
+     * @param userName the user who is submitting the file
+     * @return SubmissionResponseDto containing submission results
      */
     public SubmissionResponseDto submit(String fileId, String userName) {
         return restClient.post()

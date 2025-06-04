@@ -43,7 +43,8 @@ public class BulkUploadController {
 
     /**
      * Populates the providers in the model for the upload page.
-     * @param model
+     *
+     * @param model the model to be populated with providers.
      */
     private void populateProviders(Model model) {
         List<VendorDto> providers = cwaUploadService.getProviders("TestUser");

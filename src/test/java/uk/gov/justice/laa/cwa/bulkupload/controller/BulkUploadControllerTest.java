@@ -8,6 +8,7 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.justice.laa.cwa.bulkupload.response.CwaUploadResponseDto;
+import uk.gov.justice.laa.cwa.bulkupload.response.CwaUploadSummaryResponseDto;
 import uk.gov.justice.laa.cwa.bulkupload.response.ValidateResponseDto;
 import uk.gov.justice.laa.cwa.bulkupload.response.VirusCheckResponseDto;
 import uk.gov.justice.laa.cwa.bulkupload.service.CwaUploadService;
@@ -68,12 +69,15 @@ class BulkUploadControllerTest {
         validateResponse.setStatus("success");
         when(cwaUploadService.validate(any(), any())).thenReturn(validateResponse);
 
-        when(cwaUploadService.getUploadSummary(any())).thenReturn(List.of());
+        CwaUploadSummaryResponseDto summary = new CwaUploadSummaryResponseDto();
+        summary.setFileId(321); // Set fields as needed for your test
+        when(cwaUploadService.getUploadSummary(any())).thenReturn(List.of(summary));
 
         mockMvc.perform(multipart("/upload")
-                        .file(uploadFile))
+                        .file(uploadFile)
+                        .param("provider", "TestProvider"))
                 .andExpect(status().isOk())
-                .andExpect(view().name("pages/upload-success"));
+                .andExpect(view().name("pages/upload-results"));
     }
 
     @Test
@@ -95,7 +99,7 @@ class BulkUploadControllerTest {
 
         mockMvc.perform(multipart("/upload")
                         .file(uploadFile))
-                .andExpect(view().name("pages/upload-failure"));
+                .andExpect(view().name("pages/upload"));
 
         verify(cwaUploadService, never()).getUploadSummary(any());
     }
@@ -112,6 +116,6 @@ class BulkUploadControllerTest {
         mockMvc.perform(multipart("/upload")
                         .file(emptyFile))
                 .andExpect(status().isOk())
-                .andExpect(view().name("pages/upload-failure"));
+                .andExpect(view().name("pages/upload"));
     }
 }
