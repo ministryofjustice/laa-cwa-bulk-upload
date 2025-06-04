@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -36,9 +37,17 @@ public class BulkUploadController {
      */
     @GetMapping("/")
     public String showUploadPage(Model model) {
+        populateProviders(model);
+        return "pages/upload";
+    }
+
+    /**
+     * Populates the providers in the model for the upload page.
+     * @param model
+     */
+    private void populateProviders(Model model) {
         List<VendorDto> providers = cwaUploadService.getProviders("TestUser");
         model.addAttribute("providers", providers);
-        return "pages/upload";
     }
 
     /**
@@ -48,26 +57,37 @@ public class BulkUploadController {
      * @return the upload results page
      */
     @PostMapping("/upload")
-    public String performUpload(@RequestParam("fileUpload") MultipartFile file, String provider) {
-        if (file.isEmpty()) {
-            return "pages/upload-failure";
+    public String performUpload(@RequestParam("fileUpload") MultipartFile file, String provider, Model model) {
+        if (!StringUtils.hasText(provider)) {
+            model.addAttribute("error", "Please select a provider");
+            populateProviders(model);
+            return "pages/upload";
         }
+        if (file.isEmpty()) {
+            model.addAttribute("error", "Please select a file to upload");
+            populateProviders(model);
+            return "pages/upload";
+        }
+
         try {
             virusCheckService.checkVirus(file);
             CwaUploadResponseDto cwaUploadResponseDto = cwaUploadService.uploadFile(file, provider, "TestUser");
             ValidateResponseDto validateResponseDto = cwaUploadService.validate(cwaUploadResponseDto.getFileId(), "TestUser");
+            List<CwaUploadSummaryResponseDto> summary = cwaUploadService.getUploadSummary(cwaUploadResponseDto.getFileId());
+            model.addAttribute("summary", summary);
             if (validateResponseDto.getStatus().equals("failure")) {
                 List<CwaUploadErrorResponseDto> errors = cwaUploadService.getUploadErrors(cwaUploadResponseDto.getFileId());
                 log.error("Validation failed: {}", validateResponseDto.getMessage());
-                return "pages/upload-failure";
+                model.addAttribute("errors", errors);
+                return "pages/upload-results";
             }
             log.info("File uploaded successfully with ID: {}", cwaUploadResponseDto.getFileId());
-            List<CwaUploadSummaryResponseDto> summary = cwaUploadService.getUploadSummary(cwaUploadResponseDto.getFileId());
+
             log.info("CwaUploadResponseDto :: {}", cwaUploadResponseDto.getFileId());
         } catch (Exception e) {
             log.error("Exception", e);
         }
 
-        return "pages/upload-success";
+        return "pages/upload-results";
     }
 }

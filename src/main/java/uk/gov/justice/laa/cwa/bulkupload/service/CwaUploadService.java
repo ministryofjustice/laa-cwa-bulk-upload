@@ -11,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 import uk.gov.justice.laa.cwa.bulkupload.response.CwaUploadErrorResponseDto;
 import uk.gov.justice.laa.cwa.bulkupload.response.CwaUploadResponseDto;
 import uk.gov.justice.laa.cwa.bulkupload.response.CwaUploadSummaryResponseDto;
+import uk.gov.justice.laa.cwa.bulkupload.response.SubmissionResponseDto;
 import uk.gov.justice.laa.cwa.bulkupload.response.ValidateResponseDto;
 import uk.gov.justice.laa.cwa.bulkupload.response.VendorDto;
 
@@ -123,6 +124,24 @@ public class CwaUploadService {
                 .retrieve()
                 .body(new ParameterizedTypeReference<>() {
                 });
+
+    }
+
+    /**
+     * Submits the file for processing in CWA.
+     * @param fileId
+     * @param userName
+     * @return
+     */
+    public SubmissionResponseDto submit(String fileId, String userName) {
+        return restClient.post()
+                .uri(cwaApiUrl + "/submit", uriBuilder -> uriBuilder
+                        .queryParam("username", userName)
+                        .queryParam("am_bulk_file_id", fileId)
+                        .build())
+                .header("Authorization", "Bearer " + tokenService.getSdsAccessToken())
+                .retrieve()
+                .body(SubmissionResponseDto.class);
 
     }
 }

@@ -8,13 +8,27 @@
         <form th:action="@{/upload}" method="POST" enctype="multipart/form-data">
             <div class="govuk-grid-row">
                 <div class="govuk-grid-column-two-thirds">
+                    <div th:if="${error != null}" class="govuk-error-summary" data-module="govuk-error-summary">
+                        <div role="alert">
+                            <h2 class="govuk-error-summary__title">
+                                There is a problem
+                            </h2>
+                            <div class="govuk-error-summary__body">
+                                <ul class="govuk-list govuk-error-summary__list">
+                                    <li>
+                                        <a th:text="${error}" href="#"></a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
                     <h1 class="govuk-heading-xl">CWA Bulk Upload</h1>
                     <div class="govuk-form-group">
                         <label class="govuk-label" for="provider">
-                            Sort by
+                            Select provider
                         </label>
                         <select class="govuk-select" id="provider" name="provider">
-                            <option value="0">select option</option>
+                            <option value="">select option</option>
                             <option th:each="provider : ${providers}" th:value="${provider.vendorId}" th:text="${provider.vendorName}"></option>
                         </select>
                     </div>
