@@ -8,6 +8,13 @@
             <div class="govuk-grid-column-two-thirds">
                 <a href="/" class="govuk-back-link">Back</a>
                 <h1 class="govuk-heading-xl">CWA Bulk Upload Result</h1>
+
+                <div th:if="${errors == null}">
+                    <h2 class="govuk-heading-l">Validation Success</h2>
+                </div>
+                <div th:unless="${errors == null}">
+                    <h2 class="govuk-heading-l">Validation Failure</h2>
+                </div>
                 <table class="govuk-table">
                     <caption class="govuk-table__caption govuk-table__caption--m">Bulk upload summary</caption>
                     <thead class="govuk-table__head">
@@ -72,9 +79,7 @@
                 </table>
 
                 </div>
-                <div th:unless="${errors != null}">
-
-                <h3 class="govuk-heading-m">Bulk upload successful!</h3>
+                <div th:if="${errors == null}">
                     <form th:action="@{/submit}" method="POST" enctype="multipart/form-data">
                         <input id="fileId" name="fileId" type="hidden" th:value="${summary[0].fileId}"/>
                     <div class="govuk-grid-row">

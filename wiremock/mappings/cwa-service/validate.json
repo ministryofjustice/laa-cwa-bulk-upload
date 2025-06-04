@@ -9,7 +9,7 @@
     },
     "status": 200,
     "jsonBody": {
-      "status": "Success",
+      "status": "failure",
       "message": "successful upload",
       "data": "data"
     }
