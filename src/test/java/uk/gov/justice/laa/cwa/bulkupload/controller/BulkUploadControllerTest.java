@@ -118,4 +118,66 @@ class BulkUploadControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(view().name("pages/upload"));
     }
+
+    @Test
+    void shouldReturnErrorWhenProviderMissing() throws Exception {
+        MockMultipartFile uploadFile = new MockMultipartFile("fileUpload", "test.pdf", "text/plain", "test".getBytes());
+
+        mockMvc.perform(multipart("/upload")
+                        .file(uploadFile))
+                .andExpect(status().isOk())
+                .andExpect(view().name("pages/upload"))
+                .andExpect(content().string(containsString("Please select a provider")));
+    }
+
+    @Test
+    void shouldReturnErrorWhenFileIsEmpty() throws Exception {
+        MockMultipartFile emptyFile = new MockMultipartFile("fileUpload", "empty.txt", "text/plain", new byte[0]);
+
+        mockMvc.perform(multipart("/upload")
+                        .file(emptyFile)
+                        .param("provider", "TestProvider"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("pages/upload"))
+                .andExpect(content().string(containsString("Please select a file to upload")));
+    }
+
+    @Test
+    void shouldHandleExceptionDuringUpload() throws Exception {
+        MockMultipartFile uploadFile = new MockMultipartFile("fileUpload", "test.pdf", "text/plain", "test".getBytes());
+
+        when(virusCheckService.checkVirus(any())).thenThrow(new RuntimeException("Virus check failed"));
+
+        mockMvc.perform(multipart("/upload")
+                        .file(uploadFile)
+                        .param("provider", "TestProvider"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("pages/upload-results"));
+    }
+
+    @Test
+    void shouldShowErrorsOnValidationFailure() throws Exception {
+        MockMultipartFile uploadFile = new MockMultipartFile("fileUpload", "test.pdf", "text/plain", "test".getBytes());
+
+        when(virusCheckService.checkVirus(any())).thenReturn(new VirusCheckResponseDto());
+
+        CwaUploadResponseDto uploadResponse = new CwaUploadResponseDto();
+        uploadResponse.setFileId("file123");
+        when(cwaUploadService.uploadFile(any(), any(), any())).thenReturn(uploadResponse);
+
+        ValidateResponseDto validateResponse = new ValidateResponseDto();
+        validateResponse.setStatus("failure");
+        validateResponse.setMessage("Validation failed");
+        when(cwaUploadService.validate(any(), any())).thenReturn(validateResponse);
+
+        when(cwaUploadService.getUploadSummary(any())).thenReturn(List.of());
+        when(cwaUploadService.getUploadErrors(any())).thenReturn(List.of());
+
+        mockMvc.perform(multipart("/upload")
+                        .file(uploadFile)
+                        .param("provider", "TestProvider"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("pages/upload-results"))
+                .andExpect(content().string(containsString("Validation Failure")));
+    }
 }

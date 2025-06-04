@@ -74,6 +74,7 @@ public class BulkUploadController {
             virusCheckService.checkVirus(file);
             CwaUploadResponseDto cwaUploadResponseDto = cwaUploadService.uploadFile(file, provider, "TestUser");
             ValidateResponseDto validateResponseDto = cwaUploadService.validate(cwaUploadResponseDto.getFileId(), "TestUser");
+            model.addAttribute("uploadFileId", cwaUploadResponseDto.getFileId());
             List<CwaUploadSummaryResponseDto> summary = cwaUploadService.getUploadSummary(cwaUploadResponseDto.getFileId());
             model.addAttribute("summary", summary);
             if (validateResponseDto.getStatus().equals("failure")) {
