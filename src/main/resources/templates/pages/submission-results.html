@@ -81,16 +81,6 @@
                 </table>
 
                 </div>
-                <div th:if="${errors == null}">
-                    <form th:action="@{/submit}" method="POST" enctype="multipart/form-data">
-                        <input id="fileId" name="fileId" type="hidden" th:value="${uploadFileId}"/>
-                    <div class="govuk-grid-row">
-                        <div class="govuk-grid-column-full">
-                            <button type="submit" class="govuk-button" data-module="govuk-button">Submit</button>
-                        </div>
-                    </div>
-                    </form>
-                </div>
             </div>
         </div>
     </div>

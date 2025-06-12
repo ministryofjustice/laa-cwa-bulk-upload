@@ -12,15 +12,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.multipart.MultipartFile;
 import uk.gov.justice.laa.cwa.bulkupload.helper.ProviderHelper;
-import uk.gov.justice.laa.cwa.bulkupload.response.CwaUploadErrorResponseDto;
 import uk.gov.justice.laa.cwa.bulkupload.response.CwaUploadResponseDto;
-import uk.gov.justice.laa.cwa.bulkupload.response.CwaUploadSummaryResponseDto;
-import uk.gov.justice.laa.cwa.bulkupload.response.ValidateResponseDto;
-import uk.gov.justice.laa.cwa.bulkupload.response.VendorDto;
 import uk.gov.justice.laa.cwa.bulkupload.service.CwaUploadService;
 import uk.gov.justice.laa.cwa.bulkupload.service.VirusCheckService;
-
-import java.util.List;
 
 /**
  * Controller for handling the bulk upload requests.
@@ -52,7 +46,7 @@ public class BulkUploadController {
                 log.error("Error fetching providers", e);
                 model.addAttribute("error", "An error occurred while fetching providers.");
             }
-        }catch (Exception e) {
+        } catch (Exception e) {
             log.error("Unexpected error fetching providers", e);
             model.addAttribute("error", "An unexpected error occurred while fetching providers.");
         }
@@ -82,7 +76,7 @@ public class BulkUploadController {
             virusCheckService.checkVirus(file);
             CwaUploadResponseDto cwaUploadResponseDto = cwaUploadService.uploadFile(file, provider, "TestUser");
             model.addAttribute("fileId", cwaUploadResponseDto.getFileId());
-            model.addAttribute("provider",provider);
+            model.addAttribute("provider", provider);
             log.info("CwaUploadResponseDto :: {}", cwaUploadResponseDto.getFileId());
         } catch (Exception e) {
             log.error("Exception", e);

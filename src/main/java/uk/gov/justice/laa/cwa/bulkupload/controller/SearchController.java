@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import uk.gov.justice.laa.cwa.bulkupload.helper.ProviderHelper;
 import uk.gov.justice.laa.cwa.bulkupload.response.CwaUploadErrorResponseDto;
 import uk.gov.justice.laa.cwa.bulkupload.response.CwaUploadSummaryResponseDto;
-import uk.gov.justice.laa.cwa.bulkupload.response.ValidateResponseDto;
 import uk.gov.justice.laa.cwa.bulkupload.service.CwaUploadService;
 
 import java.util.List;
@@ -26,14 +25,17 @@ public class SearchController {
     private final ProviderHelper providerHelper;
 
     /**
-     * Handles the searching of file id in bulk upload.
-     * @param provider  the provider to be used for the search.
-     * @param searchTerm the search term to be used for the search.
-     * @param model the model to be populated with providers and error messages.
-     * @return the upload page with providers or an error message if the provider is not selected.
+     * Handles the search form submission.
+     * This method processes the search term and provider, retrieves the upload summary and errors,
+     * and returns the results page.
+     *
+     * @param provider   the selected provider.
+     * @param searchTerm the file reference to search.
+     * @param model      the model to be populated with results.
+     * @return the results page or an error page if validation fails.
      */
     @PostMapping("/search")
-    public String submitForm( String provider, String searchTerm, Model model) {
+    public String submitForm(String provider, String searchTerm, Model model) {
 
         if (!StringUtils.hasText(provider)) {
             model.addAttribute("error", "Please select a provider");
@@ -46,9 +48,9 @@ public class SearchController {
             return "pages/upload";
         }
 
-        List<CwaUploadSummaryResponseDto> summary = cwaUploadService.getUploadSummary(searchTerm,"TestUser", provider);
+        List<CwaUploadSummaryResponseDto> summary = cwaUploadService.getUploadSummary(searchTerm, "TestUser", provider);
         model.addAttribute("summary", summary);
-        List<CwaUploadErrorResponseDto> errors = cwaUploadService.getUploadErrors(searchTerm,"TestUser", provider);
+        List<CwaUploadErrorResponseDto> errors = cwaUploadService.getUploadErrors(searchTerm, "TestUser", provider);
         model.addAttribute("errors", errors);
         log.info("File uploaded successfully with ID: {}", searchTerm);
         return "pages/submission-results"; // Redirect to a success page after submission

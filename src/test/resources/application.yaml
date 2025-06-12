@@ -15,3 +15,4 @@ sds-api:
 
 cwa-api:
   url: xx
+  timeout: 1

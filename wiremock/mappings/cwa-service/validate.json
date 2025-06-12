@@ -8,7 +8,7 @@
       "Content-Type": "application/json"
     },
     "status": 200,
-    "fixedDelayMilliseconds": 1000,
+    "fixedDelayMilliseconds": 120000,
     "jsonBody": {
       "status": "Success",
       "message": "successful upload",

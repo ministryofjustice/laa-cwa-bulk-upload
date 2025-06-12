@@ -7,20 +7,14 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import uk.gov.justice.laa.cwa.bulkupload.helper.ProviderHelper;
 import uk.gov.justice.laa.cwa.bulkupload.response.CwaUploadResponseDto;
-import uk.gov.justice.laa.cwa.bulkupload.response.CwaUploadSummaryResponseDto;
-import uk.gov.justice.laa.cwa.bulkupload.response.ValidateResponseDto;
-import uk.gov.justice.laa.cwa.bulkupload.response.VirusCheckResponseDto;
 import uk.gov.justice.laa.cwa.bulkupload.service.CwaUploadService;
 import uk.gov.justice.laa.cwa.bulkupload.service.TokenService;
 import uk.gov.justice.laa.cwa.bulkupload.service.VirusCheckService;
 
-import java.util.List;
-
 import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
@@ -42,7 +36,10 @@ class BulkUploadControllerTest {
     private CwaUploadService cwaUploadService;
 
     @MockitoBean
-    private TokenService tokenService;  // Added TokenService mock
+    private TokenService tokenService;
+
+    @MockitoBean
+    private ProviderHelper providerHelper;
 
     @Test
     void shouldReturnUploadPage() throws Exception {
@@ -53,78 +50,9 @@ class BulkUploadControllerTest {
     }
 
     @Test
-    void shouldUploadFile() throws Exception {
-
-        MockMultipartFile uploadFile = new MockMultipartFile("fileUpload", "test.pdf", "text/plain", "test".getBytes());
-
-        when(virusCheckService.checkVirus(any()))
-                .thenReturn(new VirusCheckResponseDto());
-
-        // Mock CwaUploadService and its methods
-        CwaUploadResponseDto uploadResponse = new CwaUploadResponseDto();
-        uploadResponse.setFileId("file123");
-        when(cwaUploadService.uploadFile(any(), any(), any())).thenReturn(uploadResponse);
-
-        ValidateResponseDto validateResponse = new ValidateResponseDto();
-        validateResponse.setStatus("success");
-        when(cwaUploadService.validate(any(), any(),any())).thenReturn(validateResponse);
-
-        CwaUploadSummaryResponseDto summary = new CwaUploadSummaryResponseDto();
-        summary.setFileId(321); // Set fields as needed for your test
-        when(cwaUploadService.getUploadSummary(any(), any(),any())).thenReturn(List.of(summary));
-
-        mockMvc.perform(multipart("/upload")
-                        .file(uploadFile)
-                        .param("provider", "TestProvider"))
-                .andExpect(status().isOk())
-                .andExpect(view().name("pages/upload-results"));
-    }
-
-    @Test
-    void shouldNotUploadFileAndReturnErrorPage() throws Exception {
-
-        MockMultipartFile uploadFile = new MockMultipartFile("fileUpload", "test.pdf", "text/plain", "test".getBytes());
-
-        when(virusCheckService.checkVirus(any()))
-                .thenReturn(new VirusCheckResponseDto());
-
-        // Mock CwaUploadService and its methods
-        CwaUploadResponseDto uploadResponse = new CwaUploadResponseDto();
-        uploadResponse.setFileId("file123");
-        when(cwaUploadService.uploadFile(any(), any(), any())).thenReturn(uploadResponse);
-
-        ValidateResponseDto validateResponse = new ValidateResponseDto();
-        validateResponse.setStatus("failure");
-        when(cwaUploadService.validate(any(), any(),any())).thenReturn(validateResponse);
-
-        mockMvc.perform(multipart("/upload")
-                        .file(uploadFile))
-                .andExpect(view().name("pages/upload"));
-
-        verify(cwaUploadService, never()).getUploadSummary(any(),any(),any());
-    }
-
-    @Test
-    void shouldRejectEmptyFile() throws Exception {
-        MockMultipartFile emptyFile = new MockMultipartFile(
-                "fileUpload",
-                "empty.txt",
-                "text/plain",
-                new byte[0]
-        );
-
-        mockMvc.perform(multipart("/upload")
-                        .file(emptyFile))
-                .andExpect(status().isOk())
-                .andExpect(view().name("pages/upload"));
-    }
-
-    @Test
     void shouldReturnErrorWhenProviderMissing() throws Exception {
-        MockMultipartFile uploadFile = new MockMultipartFile("fileUpload", "test.pdf", "text/plain", "test".getBytes());
-
-        mockMvc.perform(multipart("/upload")
-                        .file(uploadFile))
+        MockMultipartFile file = new MockMultipartFile("fileUpload", "test.pdf", "application/pdf", "test".getBytes());
+        mockMvc.perform(multipart("/upload").file(file))
                 .andExpect(status().isOk())
                 .andExpect(view().name("pages/upload"))
                 .andExpect(content().string(containsString("Please select a provider")));
@@ -133,10 +61,7 @@ class BulkUploadControllerTest {
     @Test
     void shouldReturnErrorWhenFileIsEmpty() throws Exception {
         MockMultipartFile emptyFile = new MockMultipartFile("fileUpload", "empty.txt", "text/plain", new byte[0]);
-
-        mockMvc.perform(multipart("/upload")
-                        .file(emptyFile)
-                        .param("provider", "TestProvider"))
+        mockMvc.perform(multipart("/upload").file(emptyFile).param("provider", "TestProvider"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("pages/upload"))
                 .andExpect(content().string(containsString("Please select a file to upload")));
@@ -144,40 +69,23 @@ class BulkUploadControllerTest {
 
     @Test
     void shouldHandleExceptionDuringUpload() throws Exception {
-        MockMultipartFile uploadFile = new MockMultipartFile("fileUpload", "test.pdf", "text/plain", "test".getBytes());
-
+        MockMultipartFile file = new MockMultipartFile("fileUpload", "test.pdf", "application/pdf", "test".getBytes());
         when(virusCheckService.checkVirus(any())).thenThrow(new RuntimeException("Virus check failed"));
-
-        mockMvc.perform(multipart("/upload")
-                        .file(uploadFile)
-                        .param("provider", "TestProvider"))
+        mockMvc.perform(multipart("/upload").file(file).param("provider", "TestProvider"))
                 .andExpect(status().isOk())
-                .andExpect(view().name("pages/upload-results"));
+                .andExpect(view().name("pages/upload"))
+                .andExpect(content().string(containsString("An error occurred while uploading the file")));
     }
 
     @Test
-    void shouldShowErrorsOnValidationFailure() throws Exception {
-        MockMultipartFile uploadFile = new MockMultipartFile("fileUpload", "test.pdf", "text/plain", "test".getBytes());
-
-        when(virusCheckService.checkVirus(any())).thenReturn(new VirusCheckResponseDto());
-
-        CwaUploadResponseDto uploadResponse = new CwaUploadResponseDto();
-        uploadResponse.setFileId("file123");
-        when(cwaUploadService.uploadFile(any(), any(), any())).thenReturn(uploadResponse);
-
-        ValidateResponseDto validateResponse = new ValidateResponseDto();
-        validateResponse.setStatus("failure");
-        validateResponse.setMessage("Validation failed");
-        when(cwaUploadService.validate(any(), any(),any())).thenReturn(validateResponse);
-
-        when(cwaUploadService.getUploadSummary(any(),any(),any())).thenReturn(List.of());
-        when(cwaUploadService.getUploadErrors(any(),any(),any())).thenReturn(List.of());
-
-        mockMvc.perform(multipart("/upload")
-                        .file(uploadFile)
-                        .param("provider", "TestProvider"))
+    void shouldUploadFileSuccessfully() throws Exception {
+        when(virusCheckService.checkVirus(any())).thenReturn(null);
+        CwaUploadResponseDto response = new CwaUploadResponseDto();
+        response.setFileId("file123");
+        when(cwaUploadService.uploadFile(any(), any(), any())).thenReturn(response);
+        MockMultipartFile file = new MockMultipartFile("fileUpload", "test.pdf", "application/pdf", "test".getBytes());
+        mockMvc.perform(multipart("/upload").file(file).param("provider", "TestProvider"))
                 .andExpect(status().isOk())
-                .andExpect(view().name("pages/upload-results"))
-                .andExpect(content().string(containsString("Validation Failure")));
+                .andExpect(view().name("pages/submission"));
     }
 }

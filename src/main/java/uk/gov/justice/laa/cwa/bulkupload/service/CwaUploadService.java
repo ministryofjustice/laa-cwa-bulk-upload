@@ -37,13 +37,19 @@ public class CwaUploadService {
      */
     public CwaUploadResponseDto uploadFile(MultipartFile file, String provider, String userName) {
         if (file == null) {
-            throw new IllegalArgumentException("File cannot be null");
+            throw new IllegalArgumentException("file cannot be null");
+        }
+        if (userName == null) {
+            throw new IllegalArgumentException("userName cannot be null");
+        }
+        if (provider == null) {
+            throw new IllegalArgumentException("provider cannot be null");
         }
 
         MultipartBodyBuilder builder = new MultipartBodyBuilder();
         builder.part("file", file.getResource());
         builder.part("username", userName);
-      //  builder.part("provider", provider);
+        //  builder.part("provider", provider);
 
         return restClient.post()
                 .uri(cwaApiUrl + "/upload")
@@ -75,14 +81,23 @@ public class CwaUploadService {
     /**
      * Validates the file in CWA.
      *
-     * @param fileId the ID of the file to be validated.
+     * @param fileId   the ID of the file to be validated.
      * @param userName the user who is validating the file.
      * @param provider the provider for which validation is to be done.
      * @return ValidateResponseDto containing validation results.
      */
     public ValidateResponseDto processSubmission(String fileId, String userName, String provider) {
+        if (fileId == null) {
+            throw new IllegalArgumentException("fileId cannot be null");
+        }
+        if (userName == null) {
+            throw new IllegalArgumentException("userName cannot be null");
+        }
+        if (provider == null) {
+            throw new IllegalArgumentException("provider cannot be null");
+        }
         return restClient.post()
-                .uri(cwaApiUrl + "/process_submission", uriBuilder -> uriBuilder
+                .uri(cwaApiUrl + "/process_bulkload", uriBuilder -> uriBuilder
                         .queryParam("username", userName)
                         .queryParam("am_bulk_file_id", fileId)
                         .queryParam("vendor_id", provider)
@@ -96,7 +111,7 @@ public class CwaUploadService {
     /**
      * Retrieves the upload summary from CWA.
      *
-     * @param fileId the ID of the file for which summary is to be fetched.
+     * @param fileId   the ID of the file for which summary is to be fetched.
      * @param userName the user who is fetching the summary.
      * @param provider the provider for which summary is to be fetched.
      * @return List of CwaUploadSummaryResponseDto containing the upload summary.
@@ -118,7 +133,7 @@ public class CwaUploadService {
     /**
      * Retrieves the upload errors from CWA.
      *
-     * @param fileId the ID of the file for which errors are to be fetched.
+     * @param fileId   the ID of the file for which errors are to be fetched.
      * @param userName the user who is fetching the errors.
      * @param provider the provider for which errors are to be fetched.
      * @return List of CwaUploadErrorResponseDto containing the upload errors.
@@ -140,7 +155,7 @@ public class CwaUploadService {
     /**
      * Submits the file for processing in CWA.
      *
-     * @param fileId the ID of the file to be submitted
+     * @param fileId   the ID of the file to be submitted
      * @param userName the user who is submitting the file
      * @return SubmissionResponseDto containing submission results
      */

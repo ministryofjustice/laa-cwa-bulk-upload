@@ -2,6 +2,7 @@ package uk.gov.justice.laa.cwa.bulkupload.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,15 +26,19 @@ import java.util.concurrent.TimeoutException;
 @RequiredArgsConstructor
 @Controller
 public class SubmissionController {
+
+    @Value("${cwa-api.timeout}")
+    private int cwaApiTimeout;
     private final CwaUploadService cwaUploadService;
 
     /**
-     * Handles the submission of the file upload form.
+     * Handles the submission of a file for bulk upload.
+     * This method processes the file submission, validates it, and returns the results.
      *
      * @param fileId   the ID of the file to be submitted.
-     * @param provider the provider associated with the file.
-     * @param model    the model to be populated with submission results.
-     * @return the view name for submission results.
+     * @param provider the provider to be used for the submission.
+     * @param model    the model to be populated with providers and error messages.
+     * @return the submission results page or an error page if validation fails.
      */
     @PostMapping("/submit")
     public String submitFile(String fileId, String provider, Model model) {
@@ -44,7 +49,7 @@ public class SubmissionController {
         try {
             Future<ValidateResponseDto> future = executor.submit(() -> cwaUploadService.processSubmission(fileId, "TestUser", provider));
             // Timeout after 5 seconds
-            validateResponseDto = future.get(10, TimeUnit.SECONDS);
+            validateResponseDto = future.get(cwaApiTimeout, TimeUnit.MINUTES);
         } catch (TimeoutException e) {
             // Handle timeout
             model.addAttribute("fileId", fileId);
@@ -56,14 +61,14 @@ public class SubmissionController {
         } finally {
             executor.shutdown();
         }
-        List<CwaUploadSummaryResponseDto> summary = cwaUploadService.getUploadSummary(fileId,"TestUser", provider);
+        List<CwaUploadSummaryResponseDto> summary = cwaUploadService.getUploadSummary(fileId, "TestUser", provider);
         model.addAttribute("summary", summary);
         if (validateResponseDto == null || !"success".equalsIgnoreCase(validateResponseDto.getStatus())) {
-            List<CwaUploadErrorResponseDto> errors = cwaUploadService.getUploadErrors(fileId,"TestUser", provider);
+            List<CwaUploadErrorResponseDto> errors = cwaUploadService.getUploadErrors(fileId, "TestUser", provider);
             log.error("Validation failed: {}", validateResponseDto.getMessage());
             model.addAttribute("errors", errors);
         }
-        return "pages/submission-results";// Redirect to a success page after submission
+        return "pages/submission-results";
     }
 
 }

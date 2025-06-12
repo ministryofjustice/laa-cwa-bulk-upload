@@ -6,8 +6,13 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import uk.gov.justice.laa.cwa.bulkupload.response.SubmissionResponseDto;
+import uk.gov.justice.laa.cwa.bulkupload.response.CwaUploadErrorResponseDto;
+import uk.gov.justice.laa.cwa.bulkupload.response.CwaUploadSummaryResponseDto;
+import uk.gov.justice.laa.cwa.bulkupload.response.ValidateResponseDto;
 import uk.gov.justice.laa.cwa.bulkupload.service.CwaUploadService;
+
+import java.util.Collections;
+import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -28,38 +33,47 @@ class SubmissionControllerTest {
     private CwaUploadService cwaUploadService;
 
     @Test
-    void shouldReturnSuccessViewOnSuccessfulSubmission() throws Exception {
-        SubmissionResponseDto response = new SubmissionResponseDto();
-        response.setStatus("success");
-        response.setMessage("Submitted");
-        when(cwaUploadService.submit(eq("file123"), any())).thenReturn(response);
+    void shouldReturnResultsViewOnSuccessfulSubmission() throws Exception {
+        ValidateResponseDto validateResponse = new ValidateResponseDto();
+        validateResponse.setStatus("success");
+        validateResponse.setMessage("OK");
+        List<CwaUploadSummaryResponseDto> summary = Collections.emptyList();
 
-        mockMvc.perform(post("/submit").param("fileId", "file123"))
+        when(cwaUploadService.processSubmission(eq("file123"), any(), eq("provider1"))).thenReturn(validateResponse);
+        when(cwaUploadService.getUploadSummary(eq("file123"), any(), eq("provider1"))).thenReturn(summary);
+
+        mockMvc.perform(post("/submit").param("fileId", "file123").param("provider", "provider1"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("pages/submission-results"))
-                .andExpect(model().attributeDoesNotExist("error"));
+                .andExpect(model().attribute("summary", summary));
     }
 
     @Test
-    void shouldReturnErrorViewOnFailedSubmission() throws Exception {
-        SubmissionResponseDto response = new SubmissionResponseDto();
-        response.setStatus("failure");
-        response.setMessage("Error occurred");
-        when(cwaUploadService.submit(eq("file123"), any())).thenReturn(response);
+    void shouldReturnResultsViewWithErrorsOnValidationFailure() throws Exception {
+        ValidateResponseDto validateResponse = new ValidateResponseDto();
+        validateResponse.setStatus("failure");
+        validateResponse.setMessage("Validation failed");
+        List<CwaUploadSummaryResponseDto> summary = Collections.emptyList();
+        List<CwaUploadErrorResponseDto> errors = List.of(new CwaUploadErrorResponseDto());
 
-        mockMvc.perform(post("/submit").param("fileId", "file123"))
+        when(cwaUploadService.processSubmission(eq("file123"), any(), eq("provider1"))).thenReturn(validateResponse);
+        when(cwaUploadService.getUploadSummary(eq("file123"), any(), eq("provider1"))).thenReturn(summary);
+        when(cwaUploadService.getUploadErrors(eq("file123"), any(), eq("provider1"))).thenReturn(errors);
+
+        mockMvc.perform(post("/submit").param("fileId", "file123").param("provider", "provider1"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("pages/submission-results"))
-                .andExpect(model().attributeExists("error"));
+                .andExpect(model().attribute("errors", errors));
     }
 
     @Test
-    void shouldReturnErrorViewWhenSubmissionResponseIsNull() throws Exception {
-        when(cwaUploadService.submit(eq("file123"), any())).thenReturn(null);
+    void shouldReturnFailedViewOnOtherException() throws Exception {
+        when(cwaUploadService.processSubmission(eq("file123"), any(), eq("provider1")))
+                .thenThrow(new RuntimeException("Unexpected error"));
 
-        mockMvc.perform(post("/submit").param("fileId", "file123"))
+        mockMvc.perform(post("/submit").param("fileId", "file123").param("provider", "provider1"))
                 .andExpect(status().isOk())
-                .andExpect(view().name("pages/submission-results"))
+                .andExpect(view().name("pages/submission-failed"))
                 .andExpect(model().attributeExists("error"));
     }
 }
