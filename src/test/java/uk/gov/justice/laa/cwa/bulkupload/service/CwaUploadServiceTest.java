@@ -262,7 +262,7 @@ class CwaUploadServiceTest {
         MockMultipartFile file = new MockMultipartFile("file", "test.txt", MediaType.TEXT_PLAIN_VALUE, "test".getBytes());
         assertThatThrownBy(() -> cwaUploadService.uploadFile(file, null, "user"))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Provider cannot be null");
+                .hasMessageContaining("provider cannot be null");
     }
 
     @Test
@@ -270,7 +270,7 @@ class CwaUploadServiceTest {
         MockMultipartFile file = new MockMultipartFile("file", "test.txt", MediaType.TEXT_PLAIN_VALUE, "test".getBytes());
         assertThatThrownBy(() -> cwaUploadService.uploadFile(file, "provider", null))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("UserName cannot be null");
+                .hasMessageContaining("userName cannot be null");
     }
 
     @Test
