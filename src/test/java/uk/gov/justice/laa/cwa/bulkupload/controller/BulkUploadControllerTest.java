@@ -4,9 +4,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.client.HttpClientErrorException;
 import uk.gov.justice.laa.cwa.bulkupload.helper.ProviderHelper;
 import uk.gov.justice.laa.cwa.bulkupload.response.CwaUploadResponseDto;
 import uk.gov.justice.laa.cwa.bulkupload.service.CwaUploadService;
@@ -15,6 +17,7 @@ import uk.gov.justice.laa.cwa.bulkupload.service.VirusCheckService;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
@@ -47,6 +50,26 @@ class BulkUploadControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(view().name("pages/upload"))
                 .andExpect(content().string(containsString("Select a file to upload")));
+    }
+
+    @Test
+    void shouldReturnErrorWhenFetchingProvidersFailsWithForbidden() throws Exception {
+        doThrow(new HttpClientErrorException(HttpStatus.FORBIDDEN)).when(providerHelper).populateProviders(any());
+
+        mockMvc.perform(get("/"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("pages/upload"))
+                .andExpect(content().string(containsString("You do not have permission to view providers.")));
+    }
+
+    @Test
+    void shouldReturnErrorWhenFetchingProvidersFailsWithUnexpectedError() throws Exception {
+        doThrow(new RuntimeException("Unexpected error")).when(providerHelper).populateProviders(any());
+
+        mockMvc.perform(get("/"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("pages/upload"))
+                .andExpect(content().string(containsString("An unexpected error occurred while fetching providers.")));
     }
 
     @Test
