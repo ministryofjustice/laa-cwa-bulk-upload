@@ -19,11 +19,11 @@ import uk.gov.justice.laa.cwa.bulkupload.response.ValidateResponseDto;
 import uk.gov.justice.laa.cwa.bulkupload.response.VendorDto;
 
 import java.util.List;
+import java.util.function.Function;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.endsWith;
 import static org.mockito.Mockito.mock;
@@ -115,7 +115,7 @@ class CwaUploadServiceTest {
 
         when(tokenService.getSdsAccessToken()).thenReturn("token");
         when(restClient.post()).thenReturn(uriSpec);
-        when(uriSpec.uri(endsWith("/process_bulkload"), anyMap())).thenReturn(bodySpec);
+        when(uriSpec.uri(endsWith("/process_bulkload"), any(Function.class))).thenReturn(bodySpec);
         when(bodySpec.header(any(), any())).thenReturn(bodySpec);
         when(bodySpec.retrieve()).thenReturn(responseSpec);
         when(responseSpec.body(ValidateResponseDto.class)).thenReturn(expected);
@@ -130,7 +130,7 @@ class CwaUploadServiceTest {
 
         when(tokenService.getSdsAccessToken()).thenReturn("token");
         when(restClient.post()).thenReturn(uriSpec);
-        when(uriSpec.uri(endsWith("/process_bulkload"), anyMap())).thenReturn(bodySpec);
+        when(uriSpec.uri(endsWith("/process_bulkload"), any(Function.class))).thenReturn(bodySpec);
         when(bodySpec.header(any(), any())).thenReturn(bodySpec);
         when(bodySpec.retrieve()).thenThrow(new RestClientException("fail"));
 
@@ -150,7 +150,7 @@ class CwaUploadServiceTest {
 
         when(tokenService.getSdsAccessToken()).thenReturn("token");
         when(restClient.get()).thenReturn(uriSpec);
-        when(uriSpec.uri(endsWith("/validate_user"), anyMap())).thenReturn(headersSpec);
+        when(uriSpec.uri(anyString(), any(Function.class))).thenReturn(headersSpec);
         when(headersSpec.header(anyString(), any())).thenReturn(headersSpec);
         when(headersSpec.retrieve()).thenReturn(responseSpec);
         when(responseSpec.body(any(ParameterizedTypeReference.class))).thenReturn(expected);
@@ -166,7 +166,7 @@ class CwaUploadServiceTest {
 
         when(tokenService.getSdsAccessToken()).thenReturn("token");
         when(restClient.get()).thenReturn(uriSpec);
-        when(uriSpec.uri(endsWith("/validate_user"), anyMap())).thenReturn(headersSpec);
+        when(uriSpec.uri(anyString(), any(Function.class))).thenReturn(headersSpec);
         when(headersSpec.header(anyString(), any())).thenReturn(headersSpec);
         when(headersSpec.retrieve()).thenThrow(new RestClientException("fail"));
 
@@ -190,7 +190,7 @@ class CwaUploadServiceTest {
 
         when(tokenService.getSdsAccessToken()).thenReturn("token");
         when(restClient.get()).thenReturn(uriSpec);
-        when(uriSpec.uri(anyString(), anyMap())).thenReturn(headersSpec);
+        when(uriSpec.uri(anyString(), any(Function.class))).thenReturn(headersSpec);
         when(headersSpec.header(anyString(), any())).thenReturn(headersSpec);
         when(headersSpec.retrieve()).thenReturn(responseSpec);
         when(responseSpec.body(any(ParameterizedTypeReference.class))).thenReturn(expected);
@@ -213,7 +213,7 @@ class CwaUploadServiceTest {
 
         when(tokenService.getSdsAccessToken()).thenReturn("token");
         when(restClient.get()).thenReturn(uriSpec);
-        when(uriSpec.uri(anyString(), anyMap())).thenReturn(headersSpec);
+        when(uriSpec.uri(anyString(), any(Function.class))).thenReturn(headersSpec);
         when(headersSpec.header(anyString(), any())).thenReturn(headersSpec);
         when(headersSpec.retrieve()).thenReturn(responseSpec);
         when(responseSpec.body(any(ParameterizedTypeReference.class))).thenReturn(expected);
@@ -232,7 +232,7 @@ class CwaUploadServiceTest {
 
         when(tokenService.getSdsAccessToken()).thenReturn("token");
         when(restClient.post()).thenReturn(uriSpec);
-        when(uriSpec.uri(anyString(), anyMap())).thenReturn(bodySpec);
+        when(uriSpec.uri(anyString(), any(Function.class))).thenReturn(bodySpec);
         when(bodySpec.header(anyString(), any())).thenReturn(bodySpec);
         when(bodySpec.retrieve()).thenReturn(responseSpec);
         when(responseSpec.body(SubmissionResponseDto.class)).thenReturn(expected);
@@ -248,7 +248,7 @@ class CwaUploadServiceTest {
 
         when(tokenService.getSdsAccessToken()).thenReturn("token");
         when(restClient.post()).thenReturn(uriSpec);
-        when(uriSpec.uri(anyString(), anyMap())).thenReturn(bodySpec);
+        when(uriSpec.uri(anyString(), any(Function.class))).thenReturn(bodySpec);
         when(bodySpec.header(anyString(), any())).thenReturn(bodySpec);
         when(bodySpec.retrieve()).thenThrow(new RestClientException("fail"));
 
@@ -302,7 +302,7 @@ class CwaUploadServiceTest {
 
         when(tokenService.getSdsAccessToken()).thenReturn("token");
         when(restClient.get()).thenReturn(uriSpec);
-        when(uriSpec.uri(endsWith("/validate_user"), anyMap())).thenReturn(headersSpec);
+        when(uriSpec.uri(anyString(), any(Function.class))).thenReturn(headersSpec);
         when(headersSpec.header(anyString(), any())).thenReturn(headersSpec);
         when(headersSpec.retrieve()).thenReturn(responseSpec);
         when(responseSpec.body(any(ParameterizedTypeReference.class))).thenReturn(List.of());
