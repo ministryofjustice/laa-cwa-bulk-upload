@@ -11,6 +11,7 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
+import uk.gov.justice.laa.cwa.bulkupload.exception.VirusCheckException;
 import uk.gov.justice.laa.cwa.bulkupload.response.VirusCheckResponseDto;
 
 import java.io.IOException;
@@ -80,7 +81,7 @@ class VirusCheckServiceTest {
 
         // When/Then
         assertThatThrownBy(() -> virusCheckService.checkVirus(null))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(VirusCheckException.class)
                 .hasMessage("File cannot be null");
     }
 

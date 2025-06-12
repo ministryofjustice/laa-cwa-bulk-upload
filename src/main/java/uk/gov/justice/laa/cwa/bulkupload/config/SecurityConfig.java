@@ -16,7 +16,11 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 
     /**
-     * Security filter for application request.
+     * Security filter chain.
+     *
+     * @param http the HttpSecurity
+     * @return the SecurityFilterChain
+     * @throws Exception if an error occurs
      */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {

@@ -9,6 +9,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.multipart.MultipartFile;
+import uk.gov.justice.laa.cwa.bulkupload.exception.VirusCheckException;
 import uk.gov.justice.laa.cwa.bulkupload.response.VirusCheckResponseDto;
 
 /**
@@ -32,7 +33,7 @@ public class VirusCheckService {
      */
     public VirusCheckResponseDto checkVirus(MultipartFile file) {
         if (file == null) {
-            throw new IllegalArgumentException("File cannot be null");
+            throw new VirusCheckException("File cannot be null");
         }
 
         MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
@@ -45,7 +46,7 @@ public class VirusCheckService {
                 .retrieve()
                 .body(VirusCheckResponseDto.class);
         if (null == virusCheckResponseDto || !StringUtils.hasText(virusCheckResponseDto.getSuccess())) {
-            throw new IllegalArgumentException("Virus check failed");
+            throw new VirusCheckException("Virus check failed");
         }
         return virusCheckResponseDto;
     }
