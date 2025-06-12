@@ -2,13 +2,16 @@ package uk.gov.justice.laa.cwa.bulkupload.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.multipart.MultipartFile;
+import uk.gov.justice.laa.cwa.bulkupload.helper.ProviderHelper;
 import uk.gov.justice.laa.cwa.bulkupload.response.CwaUploadErrorResponseDto;
 import uk.gov.justice.laa.cwa.bulkupload.response.CwaUploadResponseDto;
 import uk.gov.justice.laa.cwa.bulkupload.response.CwaUploadSummaryResponseDto;
@@ -29,6 +32,7 @@ public class BulkUploadController {
 
     private final VirusCheckService virusCheckService;
     private final CwaUploadService cwaUploadService;
+    private final ProviderHelper providerHelper;
 
     /**
      * Renders the upload page.
@@ -37,18 +41,22 @@ public class BulkUploadController {
      */
     @GetMapping("/")
     public String showUploadPage(Model model) {
-        populateProviders(model);
+        try {
+            providerHelper.populateProviders(model);
+        } catch (HttpClientErrorException e) {
+            if (e.getStatusCode() == HttpStatus.FORBIDDEN) {
+                log.warn("403 Forbidden when fetching providers");
+                model.addAttribute("error", "You do not have permission to view providers.");
+                model.addAttribute("providers", java.util.Collections.emptyList());
+            } else {
+                log.error("Error fetching providers", e);
+                model.addAttribute("error", "An error occurred while fetching providers.");
+            }
+        }catch (Exception e) {
+            log.error("Unexpected error fetching providers", e);
+            model.addAttribute("error", "An unexpected error occurred while fetching providers.");
+        }
         return "pages/upload";
-    }
-
-    /**
-     * Populates the providers in the model for the upload page.
-     *
-     * @param model the model to be populated with providers.
-     */
-    private void populateProviders(Model model) {
-        List<VendorDto> providers = cwaUploadService.getProviders("TestUser");
-        model.addAttribute("providers", providers);
     }
 
     /**
@@ -61,35 +69,27 @@ public class BulkUploadController {
     public String performUpload(@RequestParam("fileUpload") MultipartFile file, String provider, Model model) {
         if (!StringUtils.hasText(provider)) {
             model.addAttribute("error", "Please select a provider");
-            populateProviders(model);
+            providerHelper.populateProviders(model);
             return "pages/upload";
         }
         if (file.isEmpty()) {
             model.addAttribute("error", "Please select a file to upload");
-            populateProviders(model);
+            providerHelper.populateProviders(model);
             return "pages/upload";
         }
 
         try {
             virusCheckService.checkVirus(file);
             CwaUploadResponseDto cwaUploadResponseDto = cwaUploadService.uploadFile(file, provider, "TestUser");
-            ValidateResponseDto validateResponseDto = cwaUploadService.validate(cwaUploadResponseDto.getFileId(), "TestUser");
-            model.addAttribute("uploadFileId", cwaUploadResponseDto.getFileId());
-            List<CwaUploadSummaryResponseDto> summary = cwaUploadService.getUploadSummary(cwaUploadResponseDto.getFileId());
-            model.addAttribute("summary", summary);
-            if (validateResponseDto.getStatus().equals("failure")) {
-                List<CwaUploadErrorResponseDto> errors = cwaUploadService.getUploadErrors(cwaUploadResponseDto.getFileId());
-                log.error("Validation failed: {}", validateResponseDto.getMessage());
-                model.addAttribute("errors", errors);
-                return "pages/upload-results";
-            }
-            log.info("File uploaded successfully with ID: {}", cwaUploadResponseDto.getFileId());
-
+            model.addAttribute("fileId", cwaUploadResponseDto.getFileId());
+            model.addAttribute("provider",provider);
             log.info("CwaUploadResponseDto :: {}", cwaUploadResponseDto.getFileId());
         } catch (Exception e) {
             log.error("Exception", e);
+            model.addAttribute("error", "An error occurred while uploading the file");
+            return "pages/upload";
         }
 
-        return "pages/upload-results";
+        return "pages/submission";
     }
 }

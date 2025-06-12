@@ -42,8 +42,8 @@ public class CwaUploadService {
 
         MultipartBodyBuilder builder = new MultipartBodyBuilder();
         builder.part("file", file.getResource());
-        builder.part("provider", provider);
         builder.part("username", userName);
+      //  builder.part("provider", provider);
 
         return restClient.post()
                 .uri(cwaApiUrl + "/upload")
@@ -62,7 +62,7 @@ public class CwaUploadService {
      */
     public List<VendorDto> getProviders(String userName) {
         return restClient.get()
-                .uri(cwaApiUrl + "/get_providers", uriBuilder -> uriBuilder
+                .uri(cwaApiUrl + "/validate_user", uriBuilder -> uriBuilder
                         .queryParam("username", userName)
                         .build())
                 .header("Authorization", "Bearer " + tokenService.getSdsAccessToken())
@@ -73,17 +73,19 @@ public class CwaUploadService {
     }
 
     /**
-     * Validates the file at CWA.
+     * Validates the file in CWA.
      *
-     * @param fileId the ID of the file to be validated
-     * @param userName the user who is validating the file
-     * @return ValidateResponseDto containing validation results
+     * @param fileId the ID of the file to be validated.
+     * @param userName the user who is validating the file.
+     * @param provider the provider for which validation is to be done.
+     * @return ValidateResponseDto containing validation results.
      */
-    public ValidateResponseDto validate(String fileId, String userName) {
+    public ValidateResponseDto processSubmission(String fileId, String userName, String provider) {
         return restClient.post()
-                .uri(cwaApiUrl + "/validate", uriBuilder -> uriBuilder
+                .uri(cwaApiUrl + "/process_submission", uriBuilder -> uriBuilder
                         .queryParam("username", userName)
                         .queryParam("am_bulk_file_id", fileId)
+                        .queryParam("vendor_id", provider)
                         .build())
                 .header("Authorization", "Bearer " + tokenService.getSdsAccessToken())
                 .retrieve()
@@ -94,13 +96,17 @@ public class CwaUploadService {
     /**
      * Retrieves the upload summary from CWA.
      *
-     * @param fileId the ID of the file for which summary is to be fetched
-     * @return List of CwaUploadSummaryResponseDto containing the upload summary
+     * @param fileId the ID of the file for which summary is to be fetched.
+     * @param userName the user who is fetching the summary.
+     * @param provider the provider for which summary is to be fetched.
+     * @return List of CwaUploadSummaryResponseDto containing the upload summary.
      */
-    public List<CwaUploadSummaryResponseDto> getUploadSummary(String fileId) {
+    public List<CwaUploadSummaryResponseDto> getUploadSummary(String fileId, String userName, String provider) {
         return restClient.get()
                 .uri(cwaApiUrl + "/get_bulkload_summary", uriBuilder -> uriBuilder
+                        .queryParam("username", userName)
                         .queryParam("am_bulk_file_id", fileId)
+                        .queryParam("vendor_id", provider)
                         .build())
                 .header("Authorization", "Bearer " + tokenService.getSdsAccessToken())
                 .retrieve()
@@ -112,13 +118,17 @@ public class CwaUploadService {
     /**
      * Retrieves the upload errors from CWA.
      *
-     * @param fileId the ID of the file for which errors are to be fetched
-     * @return List of CwaUploadErrorResponseDto containing the upload errors
+     * @param fileId the ID of the file for which errors are to be fetched.
+     * @param userName the user who is fetching the errors.
+     * @param provider the provider for which errors are to be fetched.
+     * @return List of CwaUploadErrorResponseDto containing the upload errors.
      */
-    public List<CwaUploadErrorResponseDto> getUploadErrors(String fileId) {
+    public List<CwaUploadErrorResponseDto> getUploadErrors(String fileId, String userName, String provider) {
         return restClient.get()
                 .uri(cwaApiUrl + "/get_bulkload_errors", uriBuilder -> uriBuilder
+                        .queryParam("username", userName)
                         .queryParam("am_bulk_file_id", fileId)
+                        .queryParam("vendor_id", provider)
                         .build())
                 .header("Authorization", "Bearer " + tokenService.getSdsAccessToken())
                 .retrieve()

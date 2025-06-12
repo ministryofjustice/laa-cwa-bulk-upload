@@ -67,11 +67,11 @@ class BulkUploadControllerTest {
 
         ValidateResponseDto validateResponse = new ValidateResponseDto();
         validateResponse.setStatus("success");
-        when(cwaUploadService.validate(any(), any())).thenReturn(validateResponse);
+        when(cwaUploadService.validate(any(), any(),any())).thenReturn(validateResponse);
 
         CwaUploadSummaryResponseDto summary = new CwaUploadSummaryResponseDto();
         summary.setFileId(321); // Set fields as needed for your test
-        when(cwaUploadService.getUploadSummary(any())).thenReturn(List.of(summary));
+        when(cwaUploadService.getUploadSummary(any(), any(),any())).thenReturn(List.of(summary));
 
         mockMvc.perform(multipart("/upload")
                         .file(uploadFile)
@@ -95,13 +95,13 @@ class BulkUploadControllerTest {
 
         ValidateResponseDto validateResponse = new ValidateResponseDto();
         validateResponse.setStatus("failure");
-        when(cwaUploadService.validate(any(), any())).thenReturn(validateResponse);
+        when(cwaUploadService.validate(any(), any(),any())).thenReturn(validateResponse);
 
         mockMvc.perform(multipart("/upload")
                         .file(uploadFile))
                 .andExpect(view().name("pages/upload"));
 
-        verify(cwaUploadService, never()).getUploadSummary(any());
+        verify(cwaUploadService, never()).getUploadSummary(any(),any(),any());
     }
 
     @Test
@@ -168,10 +168,10 @@ class BulkUploadControllerTest {
         ValidateResponseDto validateResponse = new ValidateResponseDto();
         validateResponse.setStatus("failure");
         validateResponse.setMessage("Validation failed");
-        when(cwaUploadService.validate(any(), any())).thenReturn(validateResponse);
+        when(cwaUploadService.validate(any(), any(),any())).thenReturn(validateResponse);
 
-        when(cwaUploadService.getUploadSummary(any())).thenReturn(List.of());
-        when(cwaUploadService.getUploadErrors(any())).thenReturn(List.of());
+        when(cwaUploadService.getUploadSummary(any(),any(),any())).thenReturn(List.of());
+        when(cwaUploadService.getUploadErrors(any(),any(),any())).thenReturn(List.of());
 
         mockMvc.perform(multipart("/upload")
                         .file(uploadFile)

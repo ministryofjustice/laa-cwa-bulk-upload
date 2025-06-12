@@ -106,6 +106,7 @@ class CwaUploadServiceTest {
     void shouldValidateFileSuccessfully() {
         String fileId = "file-123";
         String userName = "test-user";
+        String provider = "test-provider";
         ValidateResponseDto expected = new ValidateResponseDto();
 
         RestClient.RequestBodyUriSpec uriSpec = mock(RestClient.RequestBodyUriSpec.class);
@@ -114,12 +115,12 @@ class CwaUploadServiceTest {
 
         when(tokenService.getSdsAccessToken()).thenReturn("token");
         when(restClient.post()).thenReturn(uriSpec);
-        when(uriSpec.uri(endsWith("/validate"), any(Function.class))).thenReturn(bodySpec);
+        when(uriSpec.uri(endsWith("/process_bulkload"), any(Function.class))).thenReturn(bodySpec);
         when(bodySpec.header(any(), any())).thenReturn(bodySpec);
         when(bodySpec.retrieve()).thenReturn(responseSpec);
         when(responseSpec.body(ValidateResponseDto.class)).thenReturn(expected);
 
-        ValidateResponseDto result = cwaUploadService.validate(fileId, userName);
+        ValidateResponseDto result = cwaUploadService.validate(fileId, userName,provider);
         assertThat(result).isEqualTo(expected);
     }
 
@@ -130,11 +131,11 @@ class CwaUploadServiceTest {
 
         when(tokenService.getSdsAccessToken()).thenReturn("token");
         when(restClient.post()).thenReturn(uriSpec);
-        when(uriSpec.uri(endsWith("/validate"), any(Function.class))).thenReturn(bodySpec);
+        when(uriSpec.uri(endsWith("/process_bulkload"), any(Function.class))).thenReturn(bodySpec);
         when(bodySpec.header(any(), any())).thenReturn(bodySpec);
         when(bodySpec.retrieve()).thenThrow(new RestClientException("fail"));
 
-        assertThatThrownBy(() -> cwaUploadService.validate("file", "user"))
+        assertThatThrownBy(() -> cwaUploadService.validate("file", "user", "provider"))
                 .isInstanceOf(RestClientException.class)
                 .hasMessage("fail");
     }
@@ -177,6 +178,10 @@ class CwaUploadServiceTest {
 
     @Test
     void shouldGetUploadSummary() {
+        String fileId = "file-123";
+        String userName = "test-user";
+        String provider = "test-provider";
+
         RestClient.RequestHeadersUriSpec uriSpec = mock(RestClient.RequestHeadersUriSpec.class);
         RestClient.RequestHeadersSpec headersSpec = mock(RestClient.RequestHeadersSpec.class);
         RestClient.ResponseSpec responseSpec = mock(RestClient.ResponseSpec.class);
@@ -191,12 +196,16 @@ class CwaUploadServiceTest {
         when(headersSpec.retrieve()).thenReturn(responseSpec);
         when(responseSpec.body(any(ParameterizedTypeReference.class))).thenReturn(expected);
 
-        List<CwaUploadSummaryResponseDto> result = cwaUploadService.getUploadSummary("fileId");
+        List<CwaUploadSummaryResponseDto> result = cwaUploadService.getUploadSummary(fileId,userName,provider);
         assertThat(result).isEqualTo(expected);
     }
 
     @Test
     void shouldGetUploadErrors() {
+        String fileId = "file-123";
+        String userName = "test-user";
+        String provider = "test-provider";
+
         RestClient.RequestHeadersUriSpec uriSpec = mock(RestClient.RequestHeadersUriSpec.class);
         RestClient.RequestHeadersSpec headersSpec = mock(RestClient.RequestHeadersSpec.class);
         RestClient.ResponseSpec responseSpec = mock(RestClient.ResponseSpec.class);
@@ -211,7 +220,7 @@ class CwaUploadServiceTest {
         when(headersSpec.retrieve()).thenReturn(responseSpec);
         when(responseSpec.body(any(ParameterizedTypeReference.class))).thenReturn(expected);
 
-        List<CwaUploadErrorResponseDto> result = cwaUploadService.getUploadErrors("fileId");
+        List<CwaUploadErrorResponseDto> result = cwaUploadService.getUploadErrors(fileId, userName, provider);
         assertThat(result).isEqualTo(expected);
     }
 

@@ -1,7 +1,7 @@
 {
   "request": {
     "method": "GET",
-    "urlPath": "/get_providers",
+    "urlPath": "/validate_user",
     "queryParameters": {
       "username": {
         "equalTo": "TestUser"

@@ -1,15 +1,16 @@
 {
   "request": {
     "method": "POST",
-    "urlPath": "/validate"
+    "urlPath": "/process_submission"
   },
   "response": {
     "headers": {
       "Content-Type": "application/json"
     },
     "status": 200,
+    "fixedDelayMilliseconds": 1000,
     "jsonBody": {
-      "status": "failure",
+      "status": "Success",
       "message": "successful upload",
       "data": "data"
     }
