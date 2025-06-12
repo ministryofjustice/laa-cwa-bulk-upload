@@ -16,6 +16,7 @@ import uk.gov.justice.laa.cwa.bulkupload.response.ValidateResponseDto;
 import uk.gov.justice.laa.cwa.bulkupload.response.VendorDto;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Service class for performing virus check.
@@ -68,9 +69,7 @@ public class CwaUploadService {
      */
     public List<VendorDto> getProviders(String userName) {
         return restClient.get()
-                .uri(cwaApiUrl + "/validate_user", uriBuilder -> uriBuilder
-                        .queryParam("username", userName)
-                        .build())
+                .uri(cwaApiUrl + "/validate_user", Map.of("username", userName))
                 .header("Authorization", "Bearer " + tokenService.getSdsAccessToken())
                 .retrieve()
                 .body(new ParameterizedTypeReference<>() {
@@ -97,11 +96,8 @@ public class CwaUploadService {
             throw new IllegalArgumentException("provider cannot be null");
         }
         return restClient.post()
-                .uri(cwaApiUrl + "/process_bulkload", uriBuilder -> uriBuilder
-                        .queryParam("username", userName)
-                        .queryParam("am_bulk_file_id", fileId)
-                        .queryParam("vendor_id", provider)
-                        .build())
+                .uri(cwaApiUrl + "/process_bulkload",
+                        Map.of("username", userName, "am_bulk_file_id", fileId, "vendor_id", provider))
                 .header("Authorization", "Bearer " + tokenService.getSdsAccessToken())
                 .retrieve()
                 .body(ValidateResponseDto.class);
@@ -118,11 +114,8 @@ public class CwaUploadService {
      */
     public List<CwaUploadSummaryResponseDto> getUploadSummary(String fileId, String userName, String provider) {
         return restClient.get()
-                .uri(cwaApiUrl + "/get_bulkload_summary", uriBuilder -> uriBuilder
-                        .queryParam("username", userName)
-                        .queryParam("am_bulk_file_id", fileId)
-                        .queryParam("vendor_id", provider)
-                        .build())
+                .uri(cwaApiUrl + "/get_bulkload_summary",
+                        Map.of("username", userName, "am_bulk_file_id", fileId, "vendor_id", provider))
                 .header("Authorization", "Bearer " + tokenService.getSdsAccessToken())
                 .retrieve()
                 .body(new ParameterizedTypeReference<>() {
@@ -140,11 +133,8 @@ public class CwaUploadService {
      */
     public List<CwaUploadErrorResponseDto> getUploadErrors(String fileId, String userName, String provider) {
         return restClient.get()
-                .uri(cwaApiUrl + "/get_bulkload_errors", uriBuilder -> uriBuilder
-                        .queryParam("username", userName)
-                        .queryParam("am_bulk_file_id", fileId)
-                        .queryParam("vendor_id", provider)
-                        .build())
+                .uri(cwaApiUrl + "/get_bulkload_errors",
+                        Map.of("username", userName, "am_bulk_file_id", fileId, "vendor_id", provider))
                 .header("Authorization", "Bearer " + tokenService.getSdsAccessToken())
                 .retrieve()
                 .body(new ParameterizedTypeReference<>() {
@@ -161,10 +151,7 @@ public class CwaUploadService {
      */
     public SubmissionResponseDto submit(String fileId, String userName) {
         return restClient.post()
-                .uri(cwaApiUrl + "/submit", uriBuilder -> uriBuilder
-                        .queryParam("username", userName)
-                        .queryParam("am_bulk_file_id", fileId)
-                        .build())
+                .uri(cwaApiUrl + "/submit", Map.of("username", userName, "am_bulk_file_id", fileId))
                 .header("Authorization", "Bearer " + tokenService.getSdsAccessToken())
                 .retrieve()
                 .body(SubmissionResponseDto.class);

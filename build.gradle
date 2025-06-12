@@ -68,7 +68,7 @@ jacocoTestCoverageVerification {
             element = 'CLASS'
             limit {
                 counter = 'LINE'
-                minimum = 0.75
+                minimum = 0.80
             }
         }
     }
