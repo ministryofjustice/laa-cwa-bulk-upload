@@ -58,8 +58,8 @@ class BulkUploadControllerTest {
 
         mockMvc.perform(get("/"))
                 .andExpect(status().isOk())
-                .andExpect(view().name("pages/upload"))
-                .andExpect(content().string(containsString("You do not have permission to view providers.")));
+                .andExpect(view().name("pages/upload-forbidden"))
+                .andExpect(content().string(containsString("You do not have permission to access this application")));
     }
 
     @Test
@@ -68,8 +68,8 @@ class BulkUploadControllerTest {
 
         mockMvc.perform(get("/"))
                 .andExpect(status().isOk())
-                .andExpect(view().name("pages/upload"))
-                .andExpect(content().string(containsString("An unexpected error occurred while fetching providers.")));
+                .andExpect(view().name("pages/upload-error"))
+                .andExpect(content().string(containsString("Something went wrong. The error has been logged")));
     }
 
     @Test

@@ -73,7 +73,7 @@ class SubmissionControllerTest {
 
         mockMvc.perform(post("/submit").param("fileId", "file123").param("provider", "provider1"))
                 .andExpect(status().isOk())
-                .andExpect(view().name("pages/submission-failed"))
+                .andExpect(view().name("pages/submission-failure"))
                 .andExpect(model().attributeExists("error"));
     }
 }

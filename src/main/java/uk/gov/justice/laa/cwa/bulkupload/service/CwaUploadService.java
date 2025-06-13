@@ -11,7 +11,6 @@ import org.springframework.web.multipart.MultipartFile;
 import uk.gov.justice.laa.cwa.bulkupload.response.CwaUploadErrorResponseDto;
 import uk.gov.justice.laa.cwa.bulkupload.response.CwaUploadResponseDto;
 import uk.gov.justice.laa.cwa.bulkupload.response.CwaUploadSummaryResponseDto;
-import uk.gov.justice.laa.cwa.bulkupload.response.SubmissionResponseDto;
 import uk.gov.justice.laa.cwa.bulkupload.response.ValidateResponseDto;
 import uk.gov.justice.laa.cwa.bulkupload.response.VendorDto;
 

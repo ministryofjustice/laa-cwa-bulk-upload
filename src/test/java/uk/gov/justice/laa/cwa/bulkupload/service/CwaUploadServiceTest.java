@@ -14,7 +14,6 @@ import org.springframework.web.client.RestClientException;
 import uk.gov.justice.laa.cwa.bulkupload.response.CwaUploadErrorResponseDto;
 import uk.gov.justice.laa.cwa.bulkupload.response.CwaUploadResponseDto;
 import uk.gov.justice.laa.cwa.bulkupload.response.CwaUploadSummaryResponseDto;
-import uk.gov.justice.laa.cwa.bulkupload.response.SubmissionResponseDto;
 import uk.gov.justice.laa.cwa.bulkupload.response.ValidateResponseDto;
 import uk.gov.justice.laa.cwa.bulkupload.response.VendorDto;
 
@@ -115,7 +114,7 @@ class CwaUploadServiceTest {
 
         when(tokenService.getSdsAccessToken()).thenReturn("token");
         when(restClient.post()).thenReturn(uriSpec);
-        when(uriSpec.uri(endsWith("/process_bulkload"), any(Function.class))).thenReturn(bodySpec);
+        when(uriSpec.uri(endsWith("/process_submission"), any(Function.class))).thenReturn(bodySpec);
         when(bodySpec.header(any(), any())).thenReturn(bodySpec);
         when(bodySpec.retrieve()).thenReturn(responseSpec);
         when(responseSpec.body(ValidateResponseDto.class)).thenReturn(expected);
@@ -130,7 +129,7 @@ class CwaUploadServiceTest {
 
         when(tokenService.getSdsAccessToken()).thenReturn("token");
         when(restClient.post()).thenReturn(uriSpec);
-        when(uriSpec.uri(endsWith("/process_bulkload"), any(Function.class))).thenReturn(bodySpec);
+        when(uriSpec.uri(endsWith("/process_submission"), any(Function.class))).thenReturn(bodySpec);
         when(bodySpec.header(any(), any())).thenReturn(bodySpec);
         when(bodySpec.retrieve()).thenThrow(new RestClientException("fail"));
 
