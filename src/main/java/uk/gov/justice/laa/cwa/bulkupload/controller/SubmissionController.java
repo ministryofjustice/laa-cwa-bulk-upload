@@ -57,7 +57,7 @@ public class SubmissionController {
         } catch (Exception e) {
             // Handle other exceptions
             model.addAttribute("error", "An error occurred while processing the submission");
-            return "pages/submission-failed";
+            return "pages/submission-failure";
         } finally {
             executor.shutdown();
         }

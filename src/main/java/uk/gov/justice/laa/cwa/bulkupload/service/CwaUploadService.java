@@ -95,7 +95,7 @@ public class CwaUploadService {
             throw new IllegalArgumentException("provider cannot be null");
         }
         return restClient.post()
-                .uri(cwaApiUrl + "/process_bulkload", uriBuilder -> uriBuilder
+                .uri(cwaApiUrl + "/process_submission", uriBuilder -> uriBuilder
                         .queryParam("username", userName)
                         .queryParam("am_bulk_file_id", fileId)
                         .queryParam("vendor_id", provider)

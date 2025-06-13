@@ -1,7 +1,18 @@
 {
   "request": {
     "method": "POST",
-    "urlPath": "/process_submission"
+    "urlPath": "/process_submission",
+    "queryParameters": {
+      "username": {
+        "equalTo": "TestUser"
+      },
+      "am_bulk_file_id": {
+        "equalTo": "324"
+      },
+      "vendor_id": {
+        "equalTo": "1"
+      }
+    }
   },
   "response": {
     "headers": {

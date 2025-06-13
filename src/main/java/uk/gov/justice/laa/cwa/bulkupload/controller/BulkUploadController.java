@@ -40,15 +40,16 @@ public class BulkUploadController {
         } catch (HttpClientErrorException e) {
             if (e.getStatusCode() == HttpStatus.FORBIDDEN) {
                 log.warn("403 Forbidden when fetching providers");
-                model.addAttribute("error", "You do not have permission to view providers.");
-                model.addAttribute("providers", java.util.Collections.emptyList());
+                return "pages/upload-forbidden";
             } else {
                 log.error("Error fetching providers", e);
                 model.addAttribute("error", "An error occurred while fetching providers.");
+                return "pages/upload-error";
             }
         } catch (Exception e) {
             log.error("Unexpected error fetching providers", e);
             model.addAttribute("error", "An unexpected error occurred while fetching providers.");
+            return "pages/upload-error";
         }
         return "pages/upload";
     }
