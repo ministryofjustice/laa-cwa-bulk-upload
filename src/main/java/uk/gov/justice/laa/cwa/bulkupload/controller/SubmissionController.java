@@ -48,7 +48,7 @@ public class SubmissionController {
         ValidateResponseDto validateResponseDto = null;
         ExecutorService executor = Executors.newSingleThreadExecutor();
         try {
-            Future<ValidateResponseDto> future = executor.submit(() -> cwaUploadService.processSubmission(fileId, principal.getName(), provider));
+            Future<ValidateResponseDto> future = executor.submit(() -> cwaUploadService.processSubmission(fileId, principal.getName().toUpperCase(), provider));
             // Timeout after 5 seconds
             validateResponseDto = future.get(cwaApiTimeout, TimeUnit.SECONDS);
         } catch (TimeoutException e) {
@@ -65,7 +65,7 @@ public class SubmissionController {
         List<CwaUploadSummaryResponseDto> summary = cwaUploadService.getUploadSummary(fileId, principal.getName(), provider);
         model.addAttribute("summary", summary);
         if (validateResponseDto == null || !"success".equalsIgnoreCase(validateResponseDto.getStatus())) {
-            List<CwaUploadErrorResponseDto> errors = cwaUploadService.getUploadErrors(fileId, principal.getName(), provider);
+            List<CwaUploadErrorResponseDto> errors = cwaUploadService.getUploadErrors(fileId, principal.getName().toUpperCase(), provider);
             log.error("Validation failed: {}", validateResponseDto.getMessage());
             model.addAttribute("errors", errors);
         }

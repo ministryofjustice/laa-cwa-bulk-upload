@@ -51,7 +51,7 @@ public class SearchController {
 
         List<CwaUploadSummaryResponseDto> summary = cwaUploadService.getUploadSummary(searchTerm, principal.getName(), provider);
         model.addAttribute("summary", summary);
-        List<CwaUploadErrorResponseDto> errors = cwaUploadService.getUploadErrors(searchTerm, principal.getName(), provider);
+        List<CwaUploadErrorResponseDto> errors = cwaUploadService.getUploadErrors(searchTerm, principal.getName().toUpperCase(), provider);
         model.addAttribute("errors", errors);
         log.info("File uploaded successfully with ID: {}", searchTerm);
         return "pages/submission-results"; // Redirect to a success page after submission

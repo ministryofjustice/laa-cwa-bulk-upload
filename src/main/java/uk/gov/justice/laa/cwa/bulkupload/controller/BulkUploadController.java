@@ -77,7 +77,7 @@ public class BulkUploadController {
 
         try {
             virusCheckService.checkVirus(file);
-            CwaUploadResponseDto cwaUploadResponseDto = cwaUploadService.uploadFile(file, provider, principal.getName());
+            CwaUploadResponseDto cwaUploadResponseDto = cwaUploadService.uploadFile(file, provider, principal.getName().toUpperCase());
             model.addAttribute("fileId", cwaUploadResponseDto.getFileId());
             model.addAttribute("provider", provider);
             log.info("CwaUploadResponseDto :: {}", cwaUploadResponseDto.getFileId());
