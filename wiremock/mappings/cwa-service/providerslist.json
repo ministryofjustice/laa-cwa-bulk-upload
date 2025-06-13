@@ -4,7 +4,7 @@
     "urlPath": "/api/validate_user",
     "queryParameters": {
       "username": {
-        "equalTo": "TestUser"
+        "equalTo": "ERNESTCOHEN"
       }
     }
   },

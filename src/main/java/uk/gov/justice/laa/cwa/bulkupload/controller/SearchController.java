@@ -11,6 +11,7 @@ import uk.gov.justice.laa.cwa.bulkupload.response.CwaUploadErrorResponseDto;
 import uk.gov.justice.laa.cwa.bulkupload.response.CwaUploadSummaryResponseDto;
 import uk.gov.justice.laa.cwa.bulkupload.service.CwaUploadService;
 
+import java.security.Principal;
 import java.util.List;
 
 /**
@@ -35,22 +36,22 @@ public class SearchController {
      * @return the results page or an error page if validation fails.
      */
     @PostMapping("/search")
-    public String submitForm(String provider, String searchTerm, Model model) {
+    public String submitForm(String provider, String searchTerm, Model model, Principal principal) {
 
         if (!StringUtils.hasText(provider)) {
             model.addAttribute("error", "Please select a provider");
-            providerHelper.populateProviders(model);
+            providerHelper.populateProviders(model,principal);
             return "pages/upload";
         }
         if (!StringUtils.hasText(searchTerm)) {
             model.addAttribute("error", "Please enter file reference to search");
-            providerHelper.populateProviders(model);
+            providerHelper.populateProviders(model,principal);
             return "pages/upload";
         }
 
-        List<CwaUploadSummaryResponseDto> summary = cwaUploadService.getUploadSummary(searchTerm, "TestUser", provider);
+        List<CwaUploadSummaryResponseDto> summary = cwaUploadService.getUploadSummary(searchTerm, principal.getName(), provider);
         model.addAttribute("summary", summary);
-        List<CwaUploadErrorResponseDto> errors = cwaUploadService.getUploadErrors(searchTerm, "TestUser", provider);
+        List<CwaUploadErrorResponseDto> errors = cwaUploadService.getUploadErrors(searchTerm, principal.getName(), provider);
         model.addAttribute("errors", errors);
         log.info("File uploaded successfully with ID: {}", searchTerm);
         return "pages/submission-results"; // Redirect to a success page after submission

@@ -5,6 +5,7 @@ import org.springframework.ui.Model;
 import uk.gov.justice.laa.cwa.bulkupload.response.VendorDto;
 import uk.gov.justice.laa.cwa.bulkupload.service.CwaUploadService;
 
+import java.security.Principal;
 import java.util.List;
 
 /**
@@ -30,8 +31,8 @@ public class ProviderHelper {
      *
      * @param model the model to be populated.
      */
-    public void populateProviders(Model model) {
-        List<VendorDto> providers = cwaUploadService.getProviders("TestUser");
+    public void populateProviders(Model model, Principal principal) {
+        List<VendorDto> providers = cwaUploadService.getProviders(principal.getName());
         model.addAttribute("providers", providers);
     }
 }

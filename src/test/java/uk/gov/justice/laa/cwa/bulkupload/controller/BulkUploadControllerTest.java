@@ -54,7 +54,7 @@ class BulkUploadControllerTest {
 
     @Test
     void shouldReturnErrorWhenFetchingProvidersFailsWithForbidden() throws Exception {
-        doThrow(new HttpClientErrorException(HttpStatus.FORBIDDEN)).when(providerHelper).populateProviders(any());
+        doThrow(new HttpClientErrorException(HttpStatus.FORBIDDEN)).when(providerHelper).populateProviders(any(),any());
 
         mockMvc.perform(get("/"))
                 .andExpect(status().isOk())
@@ -64,7 +64,7 @@ class BulkUploadControllerTest {
 
     @Test
     void shouldReturnErrorWhenFetchingProvidersFailsWithUnexpectedError() throws Exception {
-        doThrow(new RuntimeException("Unexpected error")).when(providerHelper).populateProviders(any());
+        doThrow(new RuntimeException("Unexpected error")).when(providerHelper).populateProviders(any(),any());
 
         mockMvc.perform(get("/"))
                 .andExpect(status().isOk())

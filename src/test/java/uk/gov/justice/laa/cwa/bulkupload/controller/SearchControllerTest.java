@@ -38,7 +38,7 @@ class SearchControllerTest {
 
     @Test
     void shouldReturnErrorWhenProviderMissing() throws Exception {
-        doNothing().when(providerHelper).populateProviders(any());
+        doNothing().when(providerHelper).populateProviders(any(),any());
         mockMvc.perform(post("/search").param("searchTerm", "file123"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("pages/upload"))
@@ -47,7 +47,7 @@ class SearchControllerTest {
 
     @Test
     void shouldReturnErrorWhenSearchTermMissing() throws Exception {
-        doNothing().when(providerHelper).populateProviders(any());
+        doNothing().when(providerHelper).populateProviders(any(),any());
         mockMvc.perform(post("/search").param("provider", "TestProvider"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("pages/upload"))

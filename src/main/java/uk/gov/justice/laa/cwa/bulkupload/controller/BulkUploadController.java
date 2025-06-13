@@ -16,6 +16,8 @@ import uk.gov.justice.laa.cwa.bulkupload.response.CwaUploadResponseDto;
 import uk.gov.justice.laa.cwa.bulkupload.service.CwaUploadService;
 import uk.gov.justice.laa.cwa.bulkupload.service.VirusCheckService;
 
+import java.security.Principal;
+
 /**
  * Controller for handling the bulk upload requests.
  */
@@ -34,9 +36,9 @@ public class BulkUploadController {
      * @return the upload page
      */
     @GetMapping("/")
-    public String showUploadPage(Model model) {
+    public String showUploadPage(Model model, Principal principal) {
         try {
-            providerHelper.populateProviders(model);
+            providerHelper.populateProviders(model, principal);
         } catch (HttpClientErrorException e) {
             if (e.getStatusCode() == HttpStatus.FORBIDDEN) {
                 log.warn("403 Forbidden when fetching providers");
@@ -61,21 +63,21 @@ public class BulkUploadController {
      * @return the upload results page
      */
     @PostMapping("/upload")
-    public String performUpload(@RequestParam("fileUpload") MultipartFile file, String provider, Model model) {
+    public String performUpload(@RequestParam("fileUpload") MultipartFile file, String provider, Model model, Principal principal) {
         if (!StringUtils.hasText(provider)) {
             model.addAttribute("error", "Please select a provider");
-            providerHelper.populateProviders(model);
+            providerHelper.populateProviders(model,principal);
             return "pages/upload";
         }
         if (file.isEmpty()) {
             model.addAttribute("error", "Please select a file to upload");
-            providerHelper.populateProviders(model);
+            providerHelper.populateProviders(model,principal);
             return "pages/upload";
         }
 
         try {
             virusCheckService.checkVirus(file);
-            CwaUploadResponseDto cwaUploadResponseDto = cwaUploadService.uploadFile(file, provider, "TestUser");
+            CwaUploadResponseDto cwaUploadResponseDto = cwaUploadService.uploadFile(file, provider, principal.getName());
             model.addAttribute("fileId", cwaUploadResponseDto.getFileId());
             model.addAttribute("provider", provider);
             log.info("CwaUploadResponseDto :: {}", cwaUploadResponseDto.getFileId());

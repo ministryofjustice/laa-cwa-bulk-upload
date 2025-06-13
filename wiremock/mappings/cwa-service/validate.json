@@ -4,7 +4,7 @@
     "urlPath": "/api/process_submission",
     "queryParameters": {
       "username": {
-        "equalTo": "TestUser"
+        "equalTo": "ERNESTCOHEN"
       },
       "am_bulk_file_id": {
         "equalTo": "324"
@@ -19,7 +19,7 @@
       "Content-Type": "application/json"
     },
     "status": 200,
-    "fixedDelayMilliseconds": 120000,
+    "fixedDelayMilliseconds": 12000,
     "jsonBody": {
       "status": "Success",
       "message": "successful upload",

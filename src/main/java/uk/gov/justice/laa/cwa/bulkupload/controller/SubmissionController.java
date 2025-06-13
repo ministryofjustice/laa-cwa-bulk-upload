@@ -11,6 +11,7 @@ import uk.gov.justice.laa.cwa.bulkupload.response.CwaUploadSummaryResponseDto;
 import uk.gov.justice.laa.cwa.bulkupload.response.ValidateResponseDto;
 import uk.gov.justice.laa.cwa.bulkupload.service.CwaUploadService;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -41,13 +42,13 @@ public class SubmissionController {
      * @return the submission results page or an error page if validation fails.
      */
     @PostMapping("/submit")
-    public String submitFile(String fileId, String provider, Model model) {
+    public String submitFile(String fileId, String provider, Model model, Principal principal) {
         // This method will handle the form submission logic
         // For now, we just log the submission and return a success view
         ValidateResponseDto validateResponseDto = null;
         ExecutorService executor = Executors.newSingleThreadExecutor();
         try {
-            Future<ValidateResponseDto> future = executor.submit(() -> cwaUploadService.processSubmission(fileId, "TestUser", provider));
+            Future<ValidateResponseDto> future = executor.submit(() -> cwaUploadService.processSubmission(fileId, principal.getName(), provider));
             // Timeout after 5 seconds
             validateResponseDto = future.get(cwaApiTimeout, TimeUnit.SECONDS);
         } catch (TimeoutException e) {
@@ -61,10 +62,10 @@ public class SubmissionController {
         } finally {
             executor.shutdown();
         }
-        List<CwaUploadSummaryResponseDto> summary = cwaUploadService.getUploadSummary(fileId, "TestUser", provider);
+        List<CwaUploadSummaryResponseDto> summary = cwaUploadService.getUploadSummary(fileId, principal.getName(), provider);
         model.addAttribute("summary", summary);
         if (validateResponseDto == null || !"success".equalsIgnoreCase(validateResponseDto.getStatus())) {
-            List<CwaUploadErrorResponseDto> errors = cwaUploadService.getUploadErrors(fileId, "TestUser", provider);
+            List<CwaUploadErrorResponseDto> errors = cwaUploadService.getUploadErrors(fileId, principal.getName(), provider);
             log.error("Validation failed: {}", validateResponseDto.getMessage());
             model.addAttribute("errors", errors);
         }
