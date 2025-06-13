@@ -1,7 +1,7 @@
 {
   "request": {
     "method": "GET",
-    "urlPath": "/get_bulkload_errors",
+    "urlPath": "/api/get_bulkload_errors",
     "queryParameters": {
       "am_bulk_file_id": {
         "equalTo": "324"

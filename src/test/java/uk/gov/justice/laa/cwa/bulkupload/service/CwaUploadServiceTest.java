@@ -223,41 +223,6 @@ class CwaUploadServiceTest {
     }
 
     @Test
-    void shouldSubmitFile() {
-        RestClient.RequestBodyUriSpec uriSpec = mock(RestClient.RequestBodyUriSpec.class);
-        RestClient.RequestBodySpec bodySpec = mock(RestClient.RequestBodySpec.class);
-        RestClient.ResponseSpec responseSpec = mock(RestClient.ResponseSpec.class);
-
-        SubmissionResponseDto expected = new SubmissionResponseDto();
-
-        when(tokenService.getSdsAccessToken()).thenReturn("token");
-        when(restClient.post()).thenReturn(uriSpec);
-        when(uriSpec.uri(anyString(), any(Function.class))).thenReturn(bodySpec);
-        when(bodySpec.header(anyString(), any())).thenReturn(bodySpec);
-        when(bodySpec.retrieve()).thenReturn(responseSpec);
-        when(responseSpec.body(SubmissionResponseDto.class)).thenReturn(expected);
-
-        SubmissionResponseDto result = cwaUploadService.submit("fileId", "user");
-        assertThat(result).isEqualTo(expected);
-    }
-
-    @Test
-    void shouldPropagateRestClientExceptionOnSubmit() {
-        RestClient.RequestBodyUriSpec uriSpec = mock(RestClient.RequestBodyUriSpec.class);
-        RestClient.RequestBodySpec bodySpec = mock(RestClient.RequestBodySpec.class);
-
-        when(tokenService.getSdsAccessToken()).thenReturn("token");
-        when(restClient.post()).thenReturn(uriSpec);
-        when(uriSpec.uri(anyString(), any(Function.class))).thenReturn(bodySpec);
-        when(bodySpec.header(anyString(), any())).thenReturn(bodySpec);
-        when(bodySpec.retrieve()).thenThrow(new RestClientException("fail"));
-
-        assertThatThrownBy(() -> cwaUploadService.submit("fileId", "user"))
-                .isInstanceOf(RestClientException.class)
-                .hasMessage("fail");
-    }
-
-    @Test
     void shouldThrowIfProviderIsNullOnUploadFile() {
         MockMultipartFile file = new MockMultipartFile("file", "test.txt", MediaType.TEXT_PLAIN_VALUE, "test".getBytes());
         assertThatThrownBy(() -> cwaUploadService.uploadFile(file, null, "user"))

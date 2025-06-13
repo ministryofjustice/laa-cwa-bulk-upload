@@ -1,7 +1,7 @@
 {
   "request": {
     "method": "POST",
-    "urlPath": "/process_submission",
+    "urlPath": "/api/process_submission",
     "queryParameters": {
       "username": {
         "equalTo": "TestUser"

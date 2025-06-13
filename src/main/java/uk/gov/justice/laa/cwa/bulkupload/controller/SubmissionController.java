@@ -49,7 +49,7 @@ public class SubmissionController {
         try {
             Future<ValidateResponseDto> future = executor.submit(() -> cwaUploadService.processSubmission(fileId, "TestUser", provider));
             // Timeout after 5 seconds
-            validateResponseDto = future.get(cwaApiTimeout, TimeUnit.MINUTES);
+            validateResponseDto = future.get(cwaApiTimeout, TimeUnit.SECONDS);
         } catch (TimeoutException e) {
             // Handle timeout
             model.addAttribute("fileId", fileId);

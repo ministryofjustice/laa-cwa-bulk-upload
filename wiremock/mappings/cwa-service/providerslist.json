@@ -1,7 +1,7 @@
 {
   "request": {
     "method": "GET",
-    "urlPath": "/validate_user",
+    "urlPath": "/api/validate_user",
     "queryParameters": {
       "username": {
         "equalTo": "TestUser"
@@ -12,7 +12,7 @@
     "headers": {
       "Content-Type": "application/json"
     },
-    "status": 403,
+    "status": 200,
     "jsonBody": [
                 {
                   "VENDOR_NAME": "ABC Solicitors",
