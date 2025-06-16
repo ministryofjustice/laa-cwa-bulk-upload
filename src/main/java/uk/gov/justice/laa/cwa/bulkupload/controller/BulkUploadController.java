@@ -66,12 +66,12 @@ public class BulkUploadController {
     public String performUpload(@RequestParam("fileUpload") MultipartFile file, String provider, Model model, Principal principal) {
         if (!StringUtils.hasText(provider)) {
             model.addAttribute("error", "Please select a provider");
-            providerHelper.populateProviders(model,principal);
+            providerHelper.populateProviders(model, principal);
             return "pages/upload";
         }
         if (file.isEmpty()) {
             model.addAttribute("error", "Please select a file to upload");
-            providerHelper.populateProviders(model,principal);
+            providerHelper.populateProviders(model, principal);
             return "pages/upload";
         }
 

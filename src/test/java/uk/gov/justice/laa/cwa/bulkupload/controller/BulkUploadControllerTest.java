@@ -1,6 +1,7 @@
 package uk.gov.justice.laa.cwa.bulkupload.controller;
 
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -14,6 +15,8 @@ import uk.gov.justice.laa.cwa.bulkupload.response.CwaUploadResponseDto;
 import uk.gov.justice.laa.cwa.bulkupload.service.CwaUploadService;
 import uk.gov.justice.laa.cwa.bulkupload.service.TokenService;
 import uk.gov.justice.laa.cwa.bulkupload.service.VirusCheckService;
+
+import java.security.Principal;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.any;
@@ -44,6 +47,9 @@ class BulkUploadControllerTest {
     @MockitoBean
     private ProviderHelper providerHelper;
 
+    @Mock
+    private Principal principal;
+
     @Test
     void shouldReturnUploadPage() throws Exception {
         mockMvc.perform(get("/"))
@@ -54,7 +60,7 @@ class BulkUploadControllerTest {
 
     @Test
     void shouldReturnErrorWhenFetchingProvidersFailsWithForbidden() throws Exception {
-        doThrow(new HttpClientErrorException(HttpStatus.FORBIDDEN)).when(providerHelper).populateProviders(any(),any());
+        doThrow(new HttpClientErrorException(HttpStatus.FORBIDDEN)).when(providerHelper).populateProviders(any(), any());
 
         mockMvc.perform(get("/"))
                 .andExpect(status().isOk())
@@ -64,7 +70,7 @@ class BulkUploadControllerTest {
 
     @Test
     void shouldReturnErrorWhenFetchingProvidersFailsWithUnexpectedError() throws Exception {
-        doThrow(new RuntimeException("Unexpected error")).when(providerHelper).populateProviders(any(),any());
+        doThrow(new RuntimeException("Unexpected error")).when(providerHelper).populateProviders(any(), any());
 
         mockMvc.perform(get("/"))
                 .andExpect(status().isOk())
@@ -103,11 +109,12 @@ class BulkUploadControllerTest {
     @Test
     void shouldUploadFileSuccessfully() throws Exception {
         when(virusCheckService.checkVirus(any())).thenReturn(null);
+        when(principal.getName()).thenReturn("TestUser");
         CwaUploadResponseDto response = new CwaUploadResponseDto();
         response.setFileId("file123");
         when(cwaUploadService.uploadFile(any(), any(), any())).thenReturn(response);
-        MockMultipartFile file = new MockMultipartFile("fileUpload", "test.pdf", "application/pdf", "test".getBytes());
-        mockMvc.perform(multipart("/upload").file(file).param("provider", "TestProvider"))
+        MockMultipartFile file = new MockMultipartFile("fileUpload", "test.csv", "text/csv", "test".getBytes());
+        mockMvc.perform(multipart("/upload").file(file).param("provider", "TestProvider").principal(principal))
                 .andExpect(status().isOk())
                 .andExpect(view().name("pages/submission"));
     }

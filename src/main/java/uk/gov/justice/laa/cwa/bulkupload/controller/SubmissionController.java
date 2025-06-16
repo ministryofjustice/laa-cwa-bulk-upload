@@ -48,8 +48,8 @@ public class SubmissionController {
         ValidateResponseDto validateResponseDto = null;
         ExecutorService executor = Executors.newSingleThreadExecutor();
         try {
-            Future<ValidateResponseDto> future = executor.submit(() -> cwaUploadService.processSubmission(fileId, principal.getName().toUpperCase(), provider));
-            // Timeout after 5 seconds
+            Future<ValidateResponseDto> future = executor.submit(() -> cwaUploadService.processSubmission(fileId, principal.getName().toUpperCase(),
+                    provider));
             validateResponseDto = future.get(cwaApiTimeout, TimeUnit.SECONDS);
         } catch (TimeoutException e) {
             // Handle timeout

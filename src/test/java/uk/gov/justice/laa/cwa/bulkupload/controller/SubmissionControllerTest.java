@@ -1,6 +1,7 @@
 package uk.gov.justice.laa.cwa.bulkupload.controller;
 
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -11,6 +12,7 @@ import uk.gov.justice.laa.cwa.bulkupload.response.CwaUploadSummaryResponseDto;
 import uk.gov.justice.laa.cwa.bulkupload.response.ValidateResponseDto;
 import uk.gov.justice.laa.cwa.bulkupload.service.CwaUploadService;
 
+import java.security.Principal;
 import java.util.Collections;
 import java.util.List;
 
@@ -32,6 +34,9 @@ class SubmissionControllerTest {
     @MockitoBean
     private CwaUploadService cwaUploadService;
 
+    @Mock
+    private Principal principal;
+
     @Test
     void shouldReturnResultsViewOnSuccessfulSubmission() throws Exception {
         ValidateResponseDto validateResponse = new ValidateResponseDto();
@@ -41,8 +46,8 @@ class SubmissionControllerTest {
 
         when(cwaUploadService.processSubmission(eq("file123"), any(), eq("provider1"))).thenReturn(validateResponse);
         when(cwaUploadService.getUploadSummary(eq("file123"), any(), eq("provider1"))).thenReturn(summary);
-
-        mockMvc.perform(post("/submit").param("fileId", "file123").param("provider", "provider1"))
+        when(principal.getName()).thenReturn("TestUser");
+        mockMvc.perform(post("/submit").param("fileId", "file123").param("provider", "provider1").principal(principal))
                 .andExpect(status().isOk())
                 .andExpect(view().name("pages/submission-results"))
                 .andExpect(model().attribute("summary", summary));
@@ -59,8 +64,8 @@ class SubmissionControllerTest {
         when(cwaUploadService.processSubmission(eq("file123"), any(), eq("provider1"))).thenReturn(validateResponse);
         when(cwaUploadService.getUploadSummary(eq("file123"), any(), eq("provider1"))).thenReturn(summary);
         when(cwaUploadService.getUploadErrors(eq("file123"), any(), eq("provider1"))).thenReturn(errors);
-
-        mockMvc.perform(post("/submit").param("fileId", "file123").param("provider", "provider1"))
+        when(principal.getName()).thenReturn("TestUser");
+        mockMvc.perform(post("/submit").param("fileId", "file123").param("provider", "provider1").principal(principal))
                 .andExpect(status().isOk())
                 .andExpect(view().name("pages/submission-results"))
                 .andExpect(model().attribute("errors", errors));
@@ -70,8 +75,9 @@ class SubmissionControllerTest {
     void shouldReturnFailedViewOnOtherException() throws Exception {
         when(cwaUploadService.processSubmission(eq("file123"), any(), eq("provider1")))
                 .thenThrow(new RuntimeException("Unexpected error"));
+        when(principal.getName()).thenReturn("TestUser");
 
-        mockMvc.perform(post("/submit").param("fileId", "file123").param("provider", "provider1"))
+        mockMvc.perform(post("/submit").param("fileId", "file123").param("provider", "provider1").principal(principal))
                 .andExpect(status().isOk())
                 .andExpect(view().name("pages/submission-failure"))
                 .andExpect(model().attributeExists("error"));

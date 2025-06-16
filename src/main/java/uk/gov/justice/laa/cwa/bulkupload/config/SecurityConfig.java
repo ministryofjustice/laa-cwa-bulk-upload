@@ -13,13 +13,19 @@ import org.springframework.security.web.SecurityFilterChain;
 import static org.springframework.security.config.Customizer.withDefaults;
 
 /**
- * Security config for the application.
+ * Security configuration for the Bulk Upload application.
+ * This configuration sets up basic authentication with an in-memory user store.
  */
 @Profile("!test") // disable security for test profile
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-
+    /**
+     * UserDetailsService bean for in-memory user management.
+     * This method creates a user with username "ERNESTCOHEN" and password "password".
+     *
+     * @return the UserDetailsService instance
+     */
     @Bean
     public UserDetailsService userDetailsService() {
         var user = User
@@ -30,6 +36,15 @@ public class SecurityConfig {
         return new InMemoryUserDetailsManager(user);
     }
 
+    /**
+     * Security filter chain for the application.
+     * This method configures HTTP security to require authentication for all requests
+     * and uses basic authentication.
+     *
+     * @param http the HttpSecurity object to configure
+     * @return the configured SecurityFilterChain
+     * @throws Exception if an error occurs during configuration
+     */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http

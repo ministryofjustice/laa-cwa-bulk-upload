@@ -40,12 +40,12 @@ public class SearchController {
 
         if (!StringUtils.hasText(provider)) {
             model.addAttribute("error", "Please select a provider");
-            providerHelper.populateProviders(model,principal);
+            providerHelper.populateProviders(model, principal);
             return "pages/upload";
         }
         if (!StringUtils.hasText(searchTerm)) {
             model.addAttribute("error", "Please enter file reference to search");
-            providerHelper.populateProviders(model,principal);
+            providerHelper.populateProviders(model, principal);
             return "pages/upload";
         }
 
