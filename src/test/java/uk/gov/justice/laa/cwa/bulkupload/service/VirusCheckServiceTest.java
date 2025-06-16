@@ -41,7 +41,7 @@ class VirusCheckServiceTest {
     }
 
     @Test
-    void shouldSuccessfullyCheckVirusInFile() throws IOException {
+    void shouldSuccessfullyCheckVirusInFile() {
         // Given
         String mockToken = "mock-token";
         VirusCheckResponseDto expectedResponse = new VirusCheckResponseDto();
@@ -86,7 +86,7 @@ class VirusCheckServiceTest {
     }
 
     @Test
-    void shouldHandleRestClientException() throws IOException {
+    void shouldHandleRestClientException() {
         // Given
         MockMultipartFile file = new MockMultipartFile(
                 "file",
