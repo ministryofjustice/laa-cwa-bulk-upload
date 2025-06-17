@@ -28,7 +28,7 @@
                         </label>
                         <select class="govuk-select" id="provider" name="provider">
                             <option value="">select option</option>
-                            <option th:each="provider : ${providers}" th:value="${provider.vendorId}" th:text="${provider.vendorName}" th:selected="${provider.vendorId} == ${provider}"></option>
+                            <option th:each="provider : ${providers}" th:value="${provider.vendorId}" th:text="${provider.vendorName}"></option>
                         </select>
                     </div>
 
