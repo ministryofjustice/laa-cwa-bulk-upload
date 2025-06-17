@@ -24,7 +24,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.reactivestreams:reactive-streams:1.0.4'
-    implementation 'org.apache.tomcat.embed:tomcat-embed-core:10.1.41'
+    implementation 'org.apache.tomcat.embed:tomcat-embed-core:10.1.42'
 
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
 
