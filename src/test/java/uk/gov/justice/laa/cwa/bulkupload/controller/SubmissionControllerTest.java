@@ -8,9 +8,9 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
+import uk.gov.justice.laa.cwa.bulkupload.response.CwaSubmissionResponseDto;
 import uk.gov.justice.laa.cwa.bulkupload.response.CwaUploadErrorResponseDto;
 import uk.gov.justice.laa.cwa.bulkupload.response.CwaUploadSummaryResponseDto;
-import uk.gov.justice.laa.cwa.bulkupload.response.SubmissionResponseDto;
 import uk.gov.justice.laa.cwa.bulkupload.service.CwaUploadService;
 
 import java.security.Principal;
@@ -40,7 +40,7 @@ class SubmissionControllerTest {
 
     @Test
     void shouldReturnResultsViewOnSuccessfulSubmission() throws Exception {
-        SubmissionResponseDto validateResponse = new SubmissionResponseDto();
+        CwaSubmissionResponseDto validateResponse = new CwaSubmissionResponseDto();
         validateResponse.setStatus("success");
         validateResponse.setMessage("OK");
         List<CwaUploadSummaryResponseDto> summary = Collections.emptyList();
@@ -56,7 +56,7 @@ class SubmissionControllerTest {
 
     @Test
     void shouldReturnResultsViewWithErrorsOnValidationFailure() throws Exception {
-        SubmissionResponseDto validateResponse = new SubmissionResponseDto();
+        CwaSubmissionResponseDto validateResponse = new CwaSubmissionResponseDto();
         validateResponse.setStatus("failure");
         validateResponse.setMessage("Validation failed");
         List<CwaUploadSummaryResponseDto> summary = Collections.emptyList();
@@ -88,7 +88,7 @@ class SubmissionControllerTest {
         when(cwaUploadService.processSubmission(eq("file123"), any(), eq("provider1")))
                 .thenAnswer(invocation -> {
                     Thread.sleep(2000); // Simulate delay
-                    return new SubmissionResponseDto();
+                    return new CwaSubmissionResponseDto();
                 });
         when(principal.getName()).thenReturn("TestUser");
 
@@ -103,7 +103,7 @@ class SubmissionControllerTest {
 
     @Test
     void shouldReturnFailureViewWhenGetUploadSummaryThrows() throws Exception {
-        SubmissionResponseDto validateResponse = new SubmissionResponseDto();
+        CwaSubmissionResponseDto validateResponse = new CwaSubmissionResponseDto();
         validateResponse.setStatus("success");
         when(cwaUploadService.processSubmission(eq("file123"), any(), eq("provider1"))).thenReturn(validateResponse);
         when(cwaUploadService.getUploadSummary(eq("file123"), any(), eq("provider1"))).thenThrow(new RuntimeException("summary error"));
@@ -116,7 +116,7 @@ class SubmissionControllerTest {
 
     @Test
     void shouldReturnFailureViewWhenGetUploadErrorsThrows() throws Exception {
-        SubmissionResponseDto validateResponse = new SubmissionResponseDto();
+        CwaSubmissionResponseDto validateResponse = new CwaSubmissionResponseDto();
         validateResponse.setStatus("failure");
         when(cwaUploadService.processSubmission(eq("file123"), any(), eq("provider1"))).thenReturn(validateResponse);
         when(cwaUploadService.getUploadSummary(eq("file123"), any(), eq("provider1"))).thenReturn(Collections.emptyList());

@@ -6,9 +6,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PostMapping;
+import uk.gov.justice.laa.cwa.bulkupload.response.CwaSubmissionResponseDto;
 import uk.gov.justice.laa.cwa.bulkupload.response.CwaUploadErrorResponseDto;
 import uk.gov.justice.laa.cwa.bulkupload.response.CwaUploadSummaryResponseDto;
-import uk.gov.justice.laa.cwa.bulkupload.response.SubmissionResponseDto;
 import uk.gov.justice.laa.cwa.bulkupload.service.CwaUploadService;
 
 import java.security.Principal;
@@ -45,12 +45,12 @@ public class SubmissionController {
     public String submitFile(String fileId, String provider, Model model, Principal principal) {
         // This method will handle the form submission logic
         // For now, we just log the submission and return a success view
-        SubmissionResponseDto submissionResponseDto;
+        CwaSubmissionResponseDto cwaSubmissionResponseDto;
         ExecutorService executor = Executors.newSingleThreadExecutor();
         try {
-            Future<SubmissionResponseDto> future = executor.submit(() -> cwaUploadService.processSubmission(fileId, principal.getName().toUpperCase(),
-                    provider));
-            submissionResponseDto = future.get(cwaApiTimeout, TimeUnit.SECONDS);
+            Future<CwaSubmissionResponseDto> future = executor.submit(() -> cwaUploadService.processSubmission(fileId,
+                    principal.getName().toUpperCase(), provider));
+            cwaSubmissionResponseDto = future.get(cwaApiTimeout, TimeUnit.SECONDS);
         } catch (TimeoutException e) {
             // Handle timeout
             log.error("Submission timeout after {} secs with message {}", cwaApiTimeout, e.getMessage());
@@ -72,7 +72,7 @@ public class SubmissionController {
             return "pages/submission-failure";
         }
 
-        if (submissionResponseDto == null || !"success".equalsIgnoreCase(submissionResponseDto.getStatus())) {
+        if (cwaSubmissionResponseDto == null || !"success".equalsIgnoreCase(cwaSubmissionResponseDto.getStatus())) {
             try {
                 List<CwaUploadErrorResponseDto> errors = cwaUploadService.getUploadErrors(fileId, principal.getName().toUpperCase(), provider);
                 model.addAttribute("errors", errors);
