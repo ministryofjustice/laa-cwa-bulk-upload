@@ -11,7 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 import uk.gov.justice.laa.cwa.bulkupload.response.CwaUploadErrorResponseDto;
 import uk.gov.justice.laa.cwa.bulkupload.response.CwaUploadResponseDto;
 import uk.gov.justice.laa.cwa.bulkupload.response.CwaUploadSummaryResponseDto;
-import uk.gov.justice.laa.cwa.bulkupload.response.ValidateResponseDto;
+import uk.gov.justice.laa.cwa.bulkupload.response.SubmissionResponseDto;
 import uk.gov.justice.laa.cwa.bulkupload.response.VendorDto;
 
 import java.util.List;
@@ -81,9 +81,9 @@ public class CwaUploadService {
      * @param fileId   the ID of the file to be validated.
      * @param userName the user who is validating the file.
      * @param provider the provider for which validation is to be done.
-     * @return ValidateResponseDto containing validation results.
+     * @return SubmissionResponseDto containing validation results.
      */
-    public ValidateResponseDto processSubmission(String fileId, String userName, String provider) {
+    public SubmissionResponseDto processSubmission(String fileId, String userName, String provider) {
         if (fileId == null) {
             throw new IllegalArgumentException("fileId cannot be null");
         }
@@ -101,7 +101,7 @@ public class CwaUploadService {
                         .build())
                 .header("Authorization", "Bearer " + tokenService.getSdsAccessToken())
                 .retrieve()
-                .body(ValidateResponseDto.class);
+                .body(SubmissionResponseDto.class);
 
     }
 

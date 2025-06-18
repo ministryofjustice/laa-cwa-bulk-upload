@@ -14,7 +14,7 @@ import org.springframework.web.client.RestClientException;
 import uk.gov.justice.laa.cwa.bulkupload.response.CwaUploadErrorResponseDto;
 import uk.gov.justice.laa.cwa.bulkupload.response.CwaUploadResponseDto;
 import uk.gov.justice.laa.cwa.bulkupload.response.CwaUploadSummaryResponseDto;
-import uk.gov.justice.laa.cwa.bulkupload.response.ValidateResponseDto;
+import uk.gov.justice.laa.cwa.bulkupload.response.SubmissionResponseDto;
 import uk.gov.justice.laa.cwa.bulkupload.response.VendorDto;
 
 import java.util.List;
@@ -106,7 +106,7 @@ class CwaUploadServiceTest {
         String fileId = "file-123";
         String userName = "test-user";
         String provider = "test-provider";
-        ValidateResponseDto expected = new ValidateResponseDto();
+        SubmissionResponseDto expected = new SubmissionResponseDto();
 
         RestClient.RequestBodyUriSpec uriSpec = mock(RestClient.RequestBodyUriSpec.class);
         RestClient.RequestBodySpec bodySpec = mock(RestClient.RequestBodySpec.class);
@@ -117,8 +117,8 @@ class CwaUploadServiceTest {
         when(uriSpec.uri(endsWith("/process_submission"), any(Function.class))).thenReturn(bodySpec);
         when(bodySpec.header(any(), any())).thenReturn(bodySpec);
         when(bodySpec.retrieve()).thenReturn(responseSpec);
-        when(responseSpec.body(ValidateResponseDto.class)).thenReturn(expected);
-        ValidateResponseDto result = cwaUploadService.processSubmission(fileId, userName, provider);
+        when(responseSpec.body(SubmissionResponseDto.class)).thenReturn(expected);
+        SubmissionResponseDto result = cwaUploadService.processSubmission(fileId, userName, provider);
         assertThat(result).isEqualTo(expected);
     }
 

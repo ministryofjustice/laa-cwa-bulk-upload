@@ -8,7 +8,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PostMapping;
 import uk.gov.justice.laa.cwa.bulkupload.response.CwaUploadErrorResponseDto;
 import uk.gov.justice.laa.cwa.bulkupload.response.CwaUploadSummaryResponseDto;
-import uk.gov.justice.laa.cwa.bulkupload.response.ValidateResponseDto;
+import uk.gov.justice.laa.cwa.bulkupload.response.SubmissionResponseDto;
 import uk.gov.justice.laa.cwa.bulkupload.service.CwaUploadService;
 
 import java.security.Principal;
@@ -45,29 +45,41 @@ public class SubmissionController {
     public String submitFile(String fileId, String provider, Model model, Principal principal) {
         // This method will handle the form submission logic
         // For now, we just log the submission and return a success view
-        ValidateResponseDto validateResponseDto;
+        SubmissionResponseDto submissionResponseDto;
         ExecutorService executor = Executors.newSingleThreadExecutor();
         try {
-            Future<ValidateResponseDto> future = executor.submit(() -> cwaUploadService.processSubmission(fileId, principal.getName().toUpperCase(),
+            Future<SubmissionResponseDto> future = executor.submit(() -> cwaUploadService.processSubmission(fileId, principal.getName().toUpperCase(),
                     provider));
-            validateResponseDto = future.get(cwaApiTimeout, TimeUnit.SECONDS);
+            submissionResponseDto = future.get(cwaApiTimeout, TimeUnit.SECONDS);
         } catch (TimeoutException e) {
             // Handle timeout
+            log.error("Submission timeout after {} secs with message {}", cwaApiTimeout, e.getMessage());
             model.addAttribute("fileId", fileId);
             return "pages/submission-timeout";
         } catch (Exception e) {
             // Handle other exceptions
-            model.addAttribute("error", "An error occurred while processing the submission");
+            log.error("Submission error with message {}", e.getMessage());
             return "pages/submission-failure";
         } finally {
             executor.shutdown();
         }
-        List<CwaUploadSummaryResponseDto> summary = cwaUploadService.getUploadSummary(fileId, principal.getName(), provider);
-        model.addAttribute("summary", summary);
-        if (validateResponseDto == null || !"success".equalsIgnoreCase(validateResponseDto.getStatus())) {
-            List<CwaUploadErrorResponseDto> errors = cwaUploadService.getUploadErrors(fileId, principal.getName().toUpperCase(), provider);
-            log.error("Validation failed: {}", validateResponseDto.getMessage());
-            model.addAttribute("errors", errors);
+        List<CwaUploadSummaryResponseDto> summary;
+        try {
+            summary = cwaUploadService.getUploadSummary(fileId, principal.getName(), provider);
+            model.addAttribute("summary", summary);
+        } catch (Exception e) {
+            log.error("Error retrieving upload summary: {}", e.getMessage());
+            return "pages/submission-failure";
+        }
+
+        if (submissionResponseDto == null || !"success".equalsIgnoreCase(submissionResponseDto.getStatus())) {
+            try {
+                List<CwaUploadErrorResponseDto> errors = cwaUploadService.getUploadErrors(fileId, principal.getName().toUpperCase(), provider);
+                model.addAttribute("errors", errors);
+            } catch (Exception e) {
+                log.error("Error retrieving upload errors: {}", e.getMessage());
+                return "pages/submission-failure";
+            }
         }
         return "pages/submission-results";
     }
