@@ -73,13 +73,14 @@ public class SecurityConfig {
 
         http
                 .authorizeHttpRequests((requests) -> requests
+                        .requestMatchers("/assets/**", "/javascripts/**", "/stylesheets/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .formLogin((form) -> form
                         .loginPage("/login")
                         .permitAll()
                 )
-                .logout(LogoutConfigurer::permitAll);
+                .logout(httpSecurityLogoutConfigurer -> httpSecurityLogoutConfigurer.logoutSuccessUrl("/"));
 
         return http.build();
 
