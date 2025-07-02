@@ -29,44 +29,48 @@ public class SubmissionController {
   @Value("${cwa-api.timeout}")
   private int cwaApiTimeout;
 
-  /**
-   * Handles the submission of a file for bulk upload. This method processes the file submission,
-   * validates it, and returns the results.
-   *
-   * @param fileId the ID of the file to be submitted.
-   * @param provider the provider to be used for the submission.
-   * @param model the model to be populated with providers and error messages.
-   * @return the submission results page or an error page if validation fails.
-   */
-  @PostMapping("/submit")
-  public String submitFile(String fileId, String provider, Model model, Principal principal) {
-    // This method will handle the form submission logic
-    // For now, we just log the submission and return a success view
-    CwaSubmissionResponseDto cwaSubmissionResponseDto;
-    ExecutorService executor = Executors.newSingleThreadExecutor();
-    try {
-      Future<CwaSubmissionResponseDto> future =
-          executor.submit(
-              () ->
-                  cwaUploadService.processSubmission(
-                      fileId, principal.getName().toUpperCase(), provider));
-      cwaSubmissionResponseDto = future.get(cwaApiTimeout, TimeUnit.SECONDS);
-    } catch (TimeoutException e) {
-      // Handle timeout
-      log.error("Submission timeout after {} secs with message {}", cwaApiTimeout, e.getMessage());
-      model.addAttribute("fileId", fileId);
-      return "pages/submission-timeout";
-    } catch (Exception e) {
-      // Handle other exceptions
-      log.error("Submission error with message: {}", e.getMessage());
-      return "pages/submission-failure";
-    } finally {
-      executor.shutdown();
-    }
+    private final CwaUploadService cwaUploadService;
+
+    /**
+     * Handles the submission of a file for bulk upload.
+     * This method processes the file submission, validates it, and returns the results.
+     *
+     * @param fileId   the ID of the file to be submitted.
+     * @param provider the provider to be used for the submission.
+     * @param model    the model to be populated with providers and error messages.
+     * @return the submission results page or an error page if validation fails.
+     */
+    @PostMapping("/submit")
+    public String submitFile(String fileId, String provider, String selectedUser, Model model, Principal principal) {
+        // This method will handle the form submission logic
+        // For now, we just log the submission and return a success view
+
+        // @TODO: Uncomment the line below when the principal is ready to use
+//        String username = principal.getName().toUpperCase();
+
+        String username = selectedUser.toUpperCase();
+        CwaSubmissionResponseDto cwaSubmissionResponseDto;
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        try {
+            Future<CwaSubmissionResponseDto> future = executor.submit(() -> cwaUploadService.processSubmission(fileId,
+                    username, provider));
+            cwaSubmissionResponseDto = future.get(cwaApiTimeout, TimeUnit.SECONDS);
+        } catch (TimeoutException e) {
+            // Handle timeout
+            log.error("Submission timeout after {} secs with message {}", cwaApiTimeout, e.getMessage());
+            model.addAttribute("fileId", fileId);
+            return "pages/submission-timeout";
+        } catch (Exception e) {
+            // Handle other exceptions
+            log.error("Submission error with message: {}", e.getMessage());
+            return "pages/submission-failure";
+        } finally {
+            executor.shutdown();
+        }
 
     try {
       List<CwaUploadSummaryResponseDto> summary =
-          cwaUploadService.getUploadSummary(fileId, principal.getName(), provider);
+          cwaUploadService.getUploadSummary(fileId, username, provider);
       model.addAttribute("summary", summary);
     } catch (Exception e) {
       log.error("Error retrieving upload summary: {}", e.getMessage());
@@ -77,7 +81,7 @@ public class SubmissionController {
         || !"success".equalsIgnoreCase(cwaSubmissionResponseDto.getStatus())) {
       try {
         List<CwaUploadErrorResponseDto> errors =
-            cwaUploadService.getUploadErrors(fileId, principal.getName().toUpperCase(), provider);
+            cwaUploadService.getUploadErrors(fileId, username, provider);
         model.addAttribute("errors", errors);
       } catch (Exception e) {
         log.error("Error retrieving upload errors: {}", e.getMessage());

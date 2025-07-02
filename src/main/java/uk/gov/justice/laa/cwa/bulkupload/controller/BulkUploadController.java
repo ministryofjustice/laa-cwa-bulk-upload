@@ -31,6 +31,7 @@ public class BulkUploadController {
   private final CwaUploadService cwaUploadService;
   private final ProviderHelper providerHelper;
 
+
   @Value("${upload-max-file-size:10MB}")
   private String fileSizeLimit;
 
@@ -40,34 +41,50 @@ public class BulkUploadController {
    * @return the upload page
    */
   @GetMapping("/")
-  public String showUploadPage(Model model, Principal principal) {
-    try {
-      providerHelper.populateProviders(model, principal);
-    } catch (HttpClientErrorException e) {
-      log.error("HTTP client error fetching providers from CWA with message: {} ", e.getMessage());
-      if (e.getStatusCode() == HttpStatus.FORBIDDEN) {
-        return "pages/upload-forbidden";
-      } else {
-        return "error";
-      }
-    } catch (Exception e) {
-      log.error("Error connecting to CWA with message: {} ", e.getMessage());
-      return "error";
+  public String showSelectUserPage(Model model, Principal principal) {
+        return "pages/select-user";
     }
+
+    @PostMapping("/select-user")
+    public String selectUser(Model model, Principal principal, String selectedUser) {
+        return showUploadPage(model, principal, selectedUser);
+    }
+
+    /**
+     * Renders the upload page.
+     *
+     * @return the upload page
+     */
+    @GetMapping("/home")
+    public String showUploadPage(Model model, Principal principal, String selectedUser) {
+        try {
+            // @TODO: Uncomment the line below when the principal is ready to use
+      // providerHelper.populateProviders(model, principal.getName());
+
+            providerHelper.populateProviders(model, selectedUser);
+        } catch (HttpClientErrorException e) {
+            log.error("HTTP client error fetching providers from CWA with message: {} ", e.getMessage());
+            if (e.getStatusCode() == HttpStatus.FORBIDDEN) {
+                return "pages/upload-forbidden";
+            } else {
+                return "error";
+            }
+        } catch (Exception e) {
+            log.error("Error connecting to CWA with message: {} ", e.getMessage());
+            return "error";
+        }
+        model.addAttribute("selectedUser", selectedUser);
     return "pages/upload";
   }
 
-  /**
-   * Performs a bulk uploaded for the given file.
-   *
-   * @param file the file to be uploaded
-   * @return the upload results page
-   */
-  @PostMapping("/upload")
-  public String performUpload(
-      @RequestParam("fileUpload") MultipartFile file,
-      String provider,
-      Model model,
+    /**
+     * Performs a bulk uploaded for the given file.
+     *
+     * @param file the file to be uploaded
+     * @return the upload results page
+     */
+    @PostMapping("/upload")
+    public String performUpload(@RequestParam("fileUpload") MultipartFile file, String provider, String selectedUser, Model model,
       Principal principal) {
     long maxFileSize = DataSize.parse(fileSizeLimit).toBytes();
     Map<String, String> errors = new LinkedHashMap<>();
@@ -94,37 +111,40 @@ public class BulkUploadController {
     }
 
     if (!errors.isEmpty()) {
-      return showErrorOnUpload(model, principal, provider, errors);
+      return showErrorOnUpload(model, principal, provider, selectedUser, errors);
     }
 
     try {
-      CwaUploadResponseDto cwaUploadResponseDto =
-          cwaUploadService.uploadFile(file, provider, principal.getName().toUpperCase());
+      // @TODO: Uncomment the line below when the principal is ready to use
+//            CwaUploadResponseDto cwaUploadResponseDto = cwaUploadService.uploadFile(file, provider, principal.getName().toUpperCase());
+            CwaUploadResponseDto cwaUploadResponseDto = cwaUploadService.uploadFile(file, provider, selectedUser);
       model.addAttribute("fileId", cwaUploadResponseDto.getFileId());
       model.addAttribute("provider", provider);
       log.info("CWA Upload response fileId: {}", cwaUploadResponseDto.getFileId());
     } catch (Exception e) {
       log.error("Failed to upload file to CWA with message: {}", e.getMessage());
       errors.put("fileUpload", "An error occurred while uploading the file.");
-      return showErrorOnUpload(model, principal, provider, errors);
+      return showErrorOnUpload(model, principal, provider, selectedUser, errors);
+        }
+
+    model.addAttribute("selectedUser", selectedUser);
+        return "pages/submission";
     }
 
-    return "pages/submission";
-  }
-
-  /**
-   * Displays the error messages on the upload page.
-   *
-   * @param model the model to be populated with error messages
-   * @param principal the authenticated user principal
-   * @param provider the selected provider
-   * @param errors the map of error messages
-   * @return the upload page with error messages
-   */
-  private String showErrorOnUpload(
-      Model model, Principal principal, String provider, Map<String, String> errors) {
-    model.addAttribute("errors", errors);
-    providerHelper.populateProviders(model, principal);
+    /**
+     * Displays the error messages on the upload page.
+     *
+     * @param model     the model to be populated with error messages
+     * @param principal the authenticated user principal
+     * @param provider  the selected provider
+     * @param errors    the map of error messages
+     * @return the upload page with error messages
+     */
+    private String showErrorOnUpload(Model model, Principal principal, String provider, String selectedUser, Map<String, String> errors) {
+        model.addAttribute("errors", errors);
+        // @TODO: Uncomment the line below when the principal is ready to use
+//        providerHelper.populateProviders(model, principal.getName());
+        providerHelper.populateProviders(model, selectedUser);
     model.addAttribute(
         "selectedProvider", !StringUtils.hasText(provider) ? 0 : Integer.parseInt(provider));
     return "pages/upload";
