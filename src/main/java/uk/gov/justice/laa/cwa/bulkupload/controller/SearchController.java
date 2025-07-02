@@ -35,11 +35,9 @@ public class SearchController {
    */
   @PostMapping("/search")
   public String submitForm(String provider, String searchTerm, Model model, Principal principal, String selectedUser) {
-        // @TODO: Add when LASSIE is integrated
-        //  String username = principal.getName().toUpperCase();
+        String username = getUsername(principal, selectedUser);
 
-        String username = selectedUser.toUpperCase();
-    Map<String, String> errors = new LinkedHashMap<>();
+        Map<String, String> errors = new LinkedHashMap<>();
 
     if (!StringUtils.hasText(provider)) {
       errors.put("provider", "Please select a provider");
@@ -104,11 +102,24 @@ public class SearchController {
       }
     }
 
-    if (StringUtils.hasText(searchTerm)) {
-      model.addAttribute("searchTerm", searchTerm);
+        if (StringUtils.hasText(searchTerm)) {
+            model.addAttribute("searchTerm", searchTerm);
+        }
+        providerHelper.populateProviders(model, username);
+        model.addAttribute("tab", "search");
+
+        // @TODO: remove when LASSIE is integrated
+        model.addAttribute("selectedUser", username);
+
+        return "pages/upload";
     }
-    providerHelper.populateProviders(model, username);
-    model.addAttribute("tab", "search");
-    return "pages/upload";
-  }
+
+    private String getUsername(Principal principal, String selectedUser) {
+        // @TODO: Uncomment the line below when the principal is ready to use
+        // String username = ((DefaultOidcUser) ((OAuth2AuthenticationToken) principal).getPrincipal())
+        // .getIdToken().getClaims().get("name");
+
+        // @TODO: revise when LASSIE is integrated
+        return selectedUser;
+    }
 }

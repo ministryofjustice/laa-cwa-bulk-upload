@@ -21,6 +21,13 @@ import org.springframework.web.client.RestClientException;
 import uk.gov.justice.laa.cwa.bulkupload.exception.VirusCheckException;
 import uk.gov.justice.laa.cwa.bulkupload.response.SdsVirusCheckResponseDto;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.endsWith;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 @ExtendWith(MockitoExtension.class)
 class VirusCheckServiceTest {
 
@@ -60,14 +67,13 @@ class VirusCheckServiceTest {
         new MockMultipartFile(
             "file", "test.txt", MediaType.TEXT_PLAIN_VALUE, "test content".getBytes());
 
-    // When
-    SdsVirusCheckResponseDto result = virusCheckService.checkVirus(file);
+        // When
+        virusCheckService.checkVirus(file);
 
-    // Then
-    assertThat(result).isEqualTo(expectedResponse);
-    verify(requestBodySpec).contentType(MediaType.MULTIPART_FORM_DATA);
-    verify(requestBodySpec).header("Authorization", "Bearer " + mockToken);
-  }
+        // Then
+        verify(requestBodySpec).contentType(MediaType.MULTIPART_FORM_DATA);
+        verify(requestBodySpec).header("Authorization", "Bearer " + mockToken);
+    }
 
   @Test
   void shouldHandleNullFile() {

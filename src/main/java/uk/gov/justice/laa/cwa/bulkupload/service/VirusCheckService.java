@@ -21,15 +21,12 @@ public class VirusCheckService {
   private final TokenService tokenService;
 
   @Value("${sds-api.url}")
-  private String sdsApiUrl;
-
-  /**
-   * Perform a virus check for the given file.
-   *
-   * @param file the file
-   * @return the result
-   */
-  public SdsVirusCheckResponseDto checkVirus(MultipartFile file) {
+  private String sdsApiUrl;  /**
+     * Perform a virus check for the given file.
+     *
+     * @param file the file
+     */
+  public void checkVirus(MultipartFile file) {
     if (file == null) {
       throw new VirusCheckException("File cannot be null");
     }
@@ -45,10 +42,8 @@ public class VirusCheckService {
             .body(body)
             .retrieve()
             .body(SdsVirusCheckResponseDto.class);
-    if (null == sdsVirusCheckResponseDto
-        || !StringUtils.hasText(sdsVirusCheckResponseDto.getSuccess())) {
-      throw new VirusCheckException("Virus check failed");
+    if (sdsVirusCheckResponseDto == null || !StringUtils.hasText(sdsVirusCheckResponseDto.getSuccess())) {
+            throw new VirusCheckException("Virus check failed");
+        }
     }
-    return sdsVirusCheckResponseDto;
-  }
 }

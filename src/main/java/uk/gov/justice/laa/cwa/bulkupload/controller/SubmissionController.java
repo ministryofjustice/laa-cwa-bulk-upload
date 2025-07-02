@@ -41,9 +41,8 @@ public class SubmissionController {
      * @return the submission results page or an error page if validation fails.
      */
     @PostMapping("/submit")
-    public String submitFile(String fileId, String provider, String selectedUser, Model model, Principal principal) {
-        // @TODO: revise when LASSIE is integrated
-        String username = selectedUser.toUpperCase();
+    public String submitFile(String fileId, String provider, Model model, Principal principal, String selectedUser) {
+        String username = getUsername(principal, selectedUser);
 
         CwaSubmissionResponseDto cwaSubmissionResponseDto;
         ExecutorService executor = Executors.newSingleThreadExecutor();
@@ -73,17 +72,24 @@ public class SubmissionController {
       return "pages/submission-failure";
     }
 
-    if (cwaSubmissionResponseDto == null
-        || !"success".equalsIgnoreCase(cwaSubmissionResponseDto.getStatus())) {
-      try {
-        List<CwaUploadErrorResponseDto> errors =
-            cwaUploadService.getUploadErrors(fileId, username, provider);
-        model.addAttribute("errors", errors);
-      } catch (Exception e) {
-        log.error("Error retrieving upload errors: {}", e.getMessage());
-        return "pages/submission-failure";
-      }
+        if (cwaSubmissionResponseDto == null || !"success".equalsIgnoreCase(cwaSubmissionResponseDto.getStatus())) {
+            try {
+                List<CwaUploadErrorResponseDto> errors = cwaUploadService.getUploadErrors(fileId, username, provider);
+                model.addAttribute("errors", errors);
+            } catch (Exception e) {
+                log.error("Error retrieving upload errors: {}", e.getMessage());
+                return "pages/submission-failure";
+            }
+        }
+        return "pages/submission-results";
     }
-    return "pages/submission-results";
-  }
+
+    private String getUsername(Principal principal, String selectedUser) {
+        // @TODO: Uncomment the line below when the principal is ready to use
+        // String username = ((DefaultOidcUser) ((OAuth2AuthenticationToken) principal).getPrincipal())
+        // .getIdToken().getClaims().get("name");
+
+        // @TODO: revise when LASSIE is integrated
+        return selectedUser;
+    }
 }
