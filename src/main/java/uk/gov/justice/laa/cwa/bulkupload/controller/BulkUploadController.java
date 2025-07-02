@@ -161,10 +161,12 @@ public class BulkUploadController {
     private String showErrorOnUpload(Model model, String username, String provider, Map<String, String> errors) {
         model.addAttribute("errors", errors);
         providerHelper.populateProviders(model, username);
-    model.addAttribute(
-        "selectedProvider", !StringUtils.hasText(provider) ? 0 : Integer.parseInt(provider));
-    return "pages/upload";
-  }
+        model.addAttribute("selectedProvider", !StringUtils.hasText(provider) ? 0 : Integer.parseInt(provider));
+
+        // @TODO: remove when LASSIE is integrated
+        model.addAttribute("selectedUser", username);
+        return "pages/upload";
+    }
 
     private String getUsername(Principal principal, String selectedUser) {
         // @TODO: Uncomment the line below when the principal is ready to use
