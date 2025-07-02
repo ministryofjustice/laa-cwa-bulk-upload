@@ -164,6 +164,9 @@ public class BulkUploadController {
         model.addAttribute("errors", errors);
         providerHelper.populateProviders(model, username);
         model.addAttribute("selectedProvider", !StringUtils.hasText(provider) ? 0 : Integer.parseInt(provider));
+
+        // @TODO: remove when LASSIE is integrated
+        model.addAttribute("selectedUser", username);
         return "pages/upload";
     }
 
