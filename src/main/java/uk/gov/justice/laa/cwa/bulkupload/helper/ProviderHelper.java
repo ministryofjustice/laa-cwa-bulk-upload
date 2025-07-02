@@ -31,8 +31,8 @@ public class ProviderHelper {
      *
      * @param model the model to be populated.
      */
-    public void populateProviders(Model model, Principal principal) {
-        List<CwaVendorDto> providers = cwaUploadService.getProviders(principal.getName().toUpperCase());
+    public void populateProviders(Model model, String userName) {
+        List<CwaVendorDto> providers = cwaUploadService.getProviders(userName.toUpperCase());
         model.addAttribute("providers", providers);
     }
 }

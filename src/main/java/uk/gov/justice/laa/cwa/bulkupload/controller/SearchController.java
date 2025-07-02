@@ -98,7 +98,7 @@ public class SearchController {
         if (StringUtils.hasText(searchTerm)) {
             model.addAttribute("searchTerm", searchTerm);
         }
-        providerHelper.populateProviders(model, principal);
+        providerHelper.populateProviders(model, principal.getName());
         model.addAttribute("tab", "search");
         return "pages/upload";
     }

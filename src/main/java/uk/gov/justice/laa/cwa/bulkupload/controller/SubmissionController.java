@@ -43,14 +43,19 @@ public class SubmissionController {
      * @return the submission results page or an error page if validation fails.
      */
     @PostMapping("/submit")
-    public String submitFile(String fileId, String provider, Model model, Principal principal) {
+    public String submitFile(String fileId, String provider, String selectedUser, Model model, Principal principal) {
         // This method will handle the form submission logic
         // For now, we just log the submission and return a success view
+
+        // @TODO: Uncomment the line below when the principal is ready to use
+//        String username = principal.getName().toUpperCase();
+
+        String username = selectedUser.toUpperCase();
         CwaSubmissionResponseDto cwaSubmissionResponseDto;
         ExecutorService executor = Executors.newSingleThreadExecutor();
         try {
             Future<CwaSubmissionResponseDto> future = executor.submit(() -> cwaUploadService.processSubmission(fileId,
-                    principal.getName().toUpperCase(), provider));
+                    username, provider));
             cwaSubmissionResponseDto = future.get(cwaApiTimeout, TimeUnit.SECONDS);
         } catch (TimeoutException e) {
             // Handle timeout
@@ -66,7 +71,7 @@ public class SubmissionController {
         }
 
         try {
-            List<CwaUploadSummaryResponseDto> summary = cwaUploadService.getUploadSummary(fileId, principal.getName(), provider);
+            List<CwaUploadSummaryResponseDto> summary = cwaUploadService.getUploadSummary(fileId, username, provider);
             model.addAttribute("summary", summary);
         } catch (Exception e) {
             log.error("Error retrieving upload summary: {}", e.getMessage());
@@ -75,7 +80,7 @@ public class SubmissionController {
 
         if (cwaSubmissionResponseDto == null || !"success".equalsIgnoreCase(cwaSubmissionResponseDto.getStatus())) {
             try {
-                List<CwaUploadErrorResponseDto> errors = cwaUploadService.getUploadErrors(fileId, principal.getName().toUpperCase(), provider);
+                List<CwaUploadErrorResponseDto> errors = cwaUploadService.getUploadErrors(fileId, username, provider);
                 model.addAttribute("errors", errors);
             } catch (Exception e) {
                 log.error("Error retrieving upload errors: {}", e.getMessage());

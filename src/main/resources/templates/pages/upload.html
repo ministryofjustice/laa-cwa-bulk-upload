@@ -76,6 +76,7 @@
                                        accept=".csv,.xml,.txt"
                                        th:classappend="${errors != null && errors.containsKey('fileUpload') ? 'govuk-file-upload--error' : ''}"
                                        th:aria-describedby="${errors != null && errors.containsKey('fileUpload') ? 'file-upload-error' : ''}">
+                                <input id="selectedUser" name="selectedUser" type="hidden" th:value="${selectedUser}"/>
                                 <button type="submit" class="govuk-button" data-module="govuk-button">Upload</button>
                             </div>
 
