@@ -44,13 +44,9 @@ public class SubmissionController {
      */
     @PostMapping("/submit")
     public String submitFile(String fileId, String provider, String selectedUser, Model model, Principal principal) {
-        // This method will handle the form submission logic
-        // For now, we just log the submission and return a success view
-
-        // @TODO: Uncomment the line below when the principal is ready to use
-//        String username = principal.getName().toUpperCase();
-
+        // @TODO: revise when LASSIE is integrated
         String username = selectedUser.toUpperCase();
+
         CwaSubmissionResponseDto cwaSubmissionResponseDto;
         ExecutorService executor = Executors.newSingleThreadExecutor();
         try {

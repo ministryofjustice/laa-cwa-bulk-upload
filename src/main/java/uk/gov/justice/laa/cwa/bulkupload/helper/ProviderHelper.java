@@ -5,7 +5,6 @@ import org.springframework.ui.Model;
 import uk.gov.justice.laa.cwa.bulkupload.response.CwaVendorDto;
 import uk.gov.justice.laa.cwa.bulkupload.service.CwaUploadService;
 
-import java.security.Principal;
 import java.util.List;
 
 /**

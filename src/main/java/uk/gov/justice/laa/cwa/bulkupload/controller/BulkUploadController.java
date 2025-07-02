@@ -60,11 +60,15 @@ public class BulkUploadController {
      */
     @GetMapping("/home")
     public String showUploadPage(Model model, Principal principal, String selectedUser) {
-        try {
-            // @TODO: Uncomment the line below when the principal is ready to use
-            // providerHelper.populateProviders(model, principal.getName());
+        // @TODO: Uncomment the line below when the principal is ready to use
+        // String username = ((DefaultOidcUser) ((OAuth2AuthenticationToken) principal).getPrincipal())
+        // .getIdToken().getClaims().get("name");
 
-            providerHelper.populateProviders(model, selectedUser);
+        // @TODO: revise when LASSIE is integrated
+        String username = selectedUser.toUpperCase();
+
+        try {
+            providerHelper.populateProviders(model, username);
         } catch (HttpClientErrorException e) {
             log.error("HTTP client error fetching providers from CWA with message: {} ", e.getMessage());
             if (e.getStatusCode() == HttpStatus.FORBIDDEN) {
@@ -76,7 +80,10 @@ public class BulkUploadController {
             log.error("Error connecting to CWA with message: {} ", e.getMessage());
             return "error";
         }
-        model.addAttribute("selectedUser", selectedUser);
+
+        // @TODO: remove when LASSIE is integrated
+        model.addAttribute("selectedUser", username);
+
         return "pages/upload";
     }
 
@@ -87,7 +94,8 @@ public class BulkUploadController {
      * @return the upload results page
      */
     @PostMapping("/upload")
-    public String performUpload(@RequestParam("fileUpload") MultipartFile file, String provider, String selectedUser, Model model, Principal principal) {
+    public String performUpload(@RequestParam("fileUpload") MultipartFile file, String provider,
+                                Model model, Principal principal, String selectedUser) {
         long maxFileSize = DataSize.parse(fileSizeLimit).toBytes();
         Map<String, String> errors = new LinkedHashMap<>();
 
@@ -112,23 +120,29 @@ public class BulkUploadController {
             errors.put("fileUpload", "The file failed the virus scan. Please upload a clean file.");
         }
 
+        // @TODO: Uncomment the line below when the principal is ready to use
+        // String username = ((DefaultOidcUser) ((OAuth2AuthenticationToken) principal).getPrincipal())
+        // .getIdToken().getClaims().get("name");
+
+        // @TODO: revise when LASSIE is integrated
+        String userId = selectedUser.toUpperCase();
+
         if (!errors.isEmpty()) {
-            return showErrorOnUpload(model, principal, provider, selectedUser, errors);
+            return showErrorOnUpload(model, userId, provider, errors);
         }
 
         try {
-            // @TODO: Uncomment the line below when the principal is ready to use
-//            CwaUploadResponseDto cwaUploadResponseDto = cwaUploadService.uploadFile(file, provider, principal.getName().toUpperCase());
-            CwaUploadResponseDto cwaUploadResponseDto = cwaUploadService.uploadFile(file, provider, selectedUser);
+            CwaUploadResponseDto cwaUploadResponseDto = cwaUploadService.uploadFile(file, provider, userId);
             model.addAttribute("fileId", cwaUploadResponseDto.getFileId());
             model.addAttribute("provider", provider);
             log.info("CWA Upload response fileId: {}", cwaUploadResponseDto.getFileId());
         } catch (Exception e) {
             log.error("Failed to upload file to CWA with message: {}", e.getMessage());
             errors.put("fileUpload", "An error occurred while uploading the file.");
-            return showErrorOnUpload(model, principal, provider, selectedUser, errors);
+            return showErrorOnUpload(model, userId, provider, errors);
         }
 
+        // @TODO: remove when LASSIE is integrated
         model.addAttribute("selectedUser", selectedUser);
         return "pages/submission";
     }
@@ -137,16 +151,14 @@ public class BulkUploadController {
      * Displays the error messages on the upload page.
      *
      * @param model     the model to be populated with error messages
-     * @param principal the authenticated user principal
+     * @param userId    the user ID of the authenticated user
      * @param provider  the selected provider
      * @param errors    the map of error messages
      * @return the upload page with error messages
      */
-    private String showErrorOnUpload(Model model, Principal principal, String provider, String selectedUser, Map<String, String> errors) {
+    private String showErrorOnUpload(Model model, String userId, String provider, Map<String, String> errors) {
         model.addAttribute("errors", errors);
-        // @TODO: Uncomment the line below when the principal is ready to use
-//        providerHelper.populateProviders(model, principal.getName());
-        providerHelper.populateProviders(model, selectedUser);
+        providerHelper.populateProviders(model, userId);
         model.addAttribute("selectedProvider", !StringUtils.hasText(provider) ? 0 : Integer.parseInt(provider));
         return "pages/upload";
     }

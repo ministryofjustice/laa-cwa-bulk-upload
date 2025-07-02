@@ -26,7 +26,7 @@
                     <div class="govuk-form-group"
                          th:classappend="${errors != null && errors.containsKey('provider') ? 'govuk-form-group--error' : ''}">
                         <label class="govuk-label" for="selectedUser">
-                            Select user
+                            Select test user
                         </label>
                         <p th:if="${errors != null && errors.containsKey('provider')}" id="provider-error"
                            class="govuk-error-message">
