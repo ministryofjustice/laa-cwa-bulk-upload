@@ -29,6 +29,10 @@ import static org.mockito.Mockito.when;
 @AutoConfigureMockMvc(addFilters = false)
 class SearchControllerTest {
 
+    private static final String PROVIDER = "1";
+    private static final String SEARCH_TERM = "ref";
+    private static final String TEST_USER = "TestUser";
+
     @Mock
     private CwaUploadService cwaUploadService;
     @Mock
@@ -50,23 +54,27 @@ class SearchControllerTest {
 
     @Test
     void submitForm_shouldReturnError_whenProviderIsMissing() {
-        String view = searchController.submitForm("", "ref",  model, principal, "TESTUSER");
+        String view = searchController.submitForm("", SEARCH_TERM,  model, principal, TEST_USER);
+
         verify(model).addAttribute(eq("errors"), argThat(errors -> ((Map<?, ?>) errors).containsKey("provider")));
         assertEquals("pages/upload", view);
     }
 
     @Test
     void submitForm_shouldReturnError_whenSearchTermIsInvalid() {
-        String view = searchController.submitForm("1", "", model, principal, "TESTUSER");
+        String view = searchController.submitForm(PROVIDER, "", model, principal, TEST_USER);
+
         verify(model).addAttribute(eq("errors"), argThat(errors -> ((Map<?, ?>) errors).containsKey("searchTerm")));
         assertEquals("pages/upload", view);
     }
 
     @Test
     void submitForm_shouldReturnError_whenServiceThrowsException() {
-        when(cwaUploadService.getUploadSummary(anyString(), anyString(), anyString()))
+        when(cwaUploadService.getUploadSummary(SEARCH_TERM, TEST_USER, PROVIDER))
                 .thenThrow(new RuntimeException("fail"));
-        String view = searchController.submitForm("1", "ref", model, principal, "TESTUSER");
+
+        String view = searchController.submitForm(PROVIDER, SEARCH_TERM, model, principal, TEST_USER);
+
         verify(model).addAttribute(eq("errors"), argThat(errors -> ((Map<?, ?>) errors).containsKey("search")));
         assertEquals("pages/upload", view);
     }
@@ -75,10 +83,10 @@ class SearchControllerTest {
     void submitForm_shouldReturnSubmissionResults_whenNoErrors() {
         List<CwaUploadSummaryResponseDto> summary = Collections.emptyList();
         List<CwaUploadErrorResponseDto> uploadErrors = Collections.emptyList();
-        when(cwaUploadService.getUploadSummary(anyString(), anyString(), anyString())).thenReturn(summary);
-        when(cwaUploadService.getUploadErrors(anyString(), anyString(), anyString())).thenReturn(uploadErrors);
+        when(cwaUploadService.getUploadSummary(SEARCH_TERM, TEST_USER, PROVIDER)).thenReturn(summary);
+        when(cwaUploadService.getUploadErrors(SEARCH_TERM, TEST_USER, PROVIDER)).thenReturn(uploadErrors);
 
-        String view = searchController.submitForm("1", "ref", model, principal, "TESTUSER");
+        String view = searchController.submitForm(PROVIDER, SEARCH_TERM, model, principal, TEST_USER);
 
         verify(model).addAttribute("summary", summary);
         verify(model).addAttribute("errors", uploadErrors);
