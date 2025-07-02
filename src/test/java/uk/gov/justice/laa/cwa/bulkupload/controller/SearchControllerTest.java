@@ -23,6 +23,20 @@ import uk.gov.justice.laa.cwa.bulkupload.response.CwaUploadErrorResponseDto;
 import uk.gov.justice.laa.cwa.bulkupload.response.CwaUploadSummaryResponseDto;
 import uk.gov.justice.laa.cwa.bulkupload.service.CwaUploadService;
 
+import java.security.Principal;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.argThat;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 @AutoConfigureMockMvc(addFilters = false)
 class SearchControllerTest {
 
@@ -33,15 +47,16 @@ class SearchControllerTest {
 
   @InjectMocks private SearchController searchController;
 
-  @BeforeEach
-  void setUp() {
-    MockitoAnnotations.openMocks(this);
-    when(principal.getName()).thenReturn("USER");
-  }
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
+        when(principal.getName()).thenReturn("USER");
+        doNothing().when(providerHelper).populateProviders(any(Model.class), anyString());
+    }
 
   @Test
   void submitForm_shouldReturnError_whenProviderIsMissing() {
-    String view = searchController.submitForm("", "ref", model, principal);
+    String view = searchController.submitForm("", "ref",  model, principal, "TESTUSER");
     verify(model)
         .addAttribute(
             eq("errors"), argThat(errors -> ((Map<?, ?>) errors).containsKey("provider")));
@@ -50,7 +65,7 @@ class SearchControllerTest {
 
   @Test
   void submitForm_shouldReturnError_whenSearchTermIsInvalid() {
-    String view = searchController.submitForm("1", "", model, principal);
+    String view = searchController.submitForm("1", "", model, principal, "TESTUSER");
     verify(model)
         .addAttribute(
             eq("errors"), argThat(errors -> ((Map<?, ?>) errors).containsKey("searchTerm")));
@@ -61,7 +76,7 @@ class SearchControllerTest {
   void submitForm_shouldReturnError_whenServiceThrowsException() {
     when(cwaUploadService.getUploadSummary(anyString(), anyString(), anyString()))
         .thenThrow(new RuntimeException("fail"));
-    String view = searchController.submitForm("1", "ref", model, principal);
+    String view = searchController.submitForm("1", "ref", model, principal, "TESTUSER");
     verify(model)
         .addAttribute(eq("errors"), argThat(errors -> ((Map<?, ?>) errors).containsKey("search")));
     assertEquals("pages/upload", view);
@@ -76,7 +91,7 @@ class SearchControllerTest {
     when(cwaUploadService.getUploadErrors(anyString(), anyString(), anyString()))
         .thenReturn(uploadErrors);
 
-    String view = searchController.submitForm("1", "ref", model, principal);
+    String view = searchController.submitForm("1", "ref", model, principal, "TESTUSER");
 
     verify(model).addAttribute("summary", summary);
     verify(model).addAttribute("errors", uploadErrors);

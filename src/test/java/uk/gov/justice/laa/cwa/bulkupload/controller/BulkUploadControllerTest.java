@@ -43,7 +43,7 @@ class BulkUploadControllerTest {
 
   @Test
   void shouldReturnUploadPage() throws Exception {
-    mockMvc.perform(get("/")).andExpect(status().isOk()).andExpect(view().name("pages/upload"));
+    mockMvc.perform(get("/")).andExpect(status().isOk()).andExpect(view().name("pages/select-user"));
   }
 
   @Test
@@ -52,7 +52,7 @@ class BulkUploadControllerTest {
         .when(providerHelper)
         .populateProviders(any(), any());
     mockMvc
-        .perform(get("/"))
+        .perform(get("/home").param("selectedUser", "TestUser"))
         .andExpect(status().isOk())
         .andExpect(view().name("pages/upload-forbidden"));
   }
@@ -62,7 +62,7 @@ class BulkUploadControllerTest {
     doThrow(new RuntimeException("Unexpected error"))
         .when(providerHelper)
         .populateProviders(any(), any());
-    mockMvc.perform(get("/")).andExpect(status().isOk()).andExpect(view().name("error"));
+    mockMvc.perform(get("/home").param("selectedUser", "TestUser")).andExpect(status().isOk()).andExpect(view().name("error"));
   }
 
   @Test
@@ -70,7 +70,7 @@ class BulkUploadControllerTest {
     MockMultipartFile file =
         new MockMultipartFile("fileUpload", "test.pdf", "application/pdf", "test".getBytes());
     mockMvc
-        .perform(multipart("/upload").file(file))
+        .perform(multipart("/upload").file(file).param("selectedUser", "TestUser"))
         .andExpect(status().isOk())
         .andExpect(view().name("pages/upload"))
         .andExpect(content().string(containsString("Please select a provider")));
@@ -81,8 +81,9 @@ class BulkUploadControllerTest {
     MockMultipartFile emptyFile =
         new MockMultipartFile("fileUpload", "empty.txt", "text/plain", new byte[0]);
     mockMvc
-        .perform(multipart("/upload").file(emptyFile).param("provider", "123"))
-        .andExpect(status().isOk())
+        .perform(multipart("/upload").file(emptyFile).param("provider", "123")
+        .param("selectedUser", "TestUser"))
+                .andExpect(status().isOk())
         .andExpect(view().name("pages/upload"))
         .andExpect(content().string(containsString("Please select a file to upload")));
   }
@@ -92,8 +93,9 @@ class BulkUploadControllerTest {
     MockMultipartFile file =
         new MockMultipartFile("fileUpload", "big.csv", "text/csv", new byte[11 * 1024 * 1024]);
     mockMvc
-        .perform(multipart("/upload").file(file).param("provider", "123"))
-        .andExpect(status().isOk())
+        .perform(multipart("/upload").file(file).param("provider", "123")
+                        .param("selectedUser", "TestUser"))
+                .andExpect(status().isOk())
         .andExpect(view().name("pages/upload"))
         .andExpect(content().string(containsString("File size must not exceed 10MB")));
   }
@@ -104,8 +106,9 @@ class BulkUploadControllerTest {
         new MockMultipartFile("fileUpload", "test.csv", "text/csv", "test".getBytes());
     doThrow(new RuntimeException("Virus detected")).when(virusCheckService).checkVirus(any());
     mockMvc
-        .perform(multipart("/upload").file(file).param("provider", "123"))
-        .andExpect(status().isOk())
+        .perform(multipart("/upload").file(file).param("provider", "123")
+                        .param("selectedUser", "TestUser"))
+                .andExpect(status().isOk())
         .andExpect(view().name("pages/upload"))
         .andExpect(
             content()
@@ -123,8 +126,9 @@ class BulkUploadControllerTest {
     MockMultipartFile file =
         new MockMultipartFile("fileUpload", "test.csv", "text/csv", "test".getBytes());
     mockMvc
-        .perform(multipart("/upload").file(file).param("provider", "123").principal(principal))
-        .andExpect(status().isOk())
+        .perform(multipart("/upload").file(file).param("provider", "123").principal(principal)
+                        .param("selectedUser", "TestUser"))
+                .andExpect(status().isOk())
         .andExpect(view().name("pages/upload"))
         .andExpect(content().string(containsString("An error occurred while uploading the file.")));
   }
@@ -139,8 +143,9 @@ class BulkUploadControllerTest {
     MockMultipartFile file =
         new MockMultipartFile("fileUpload", "test.csv", "text/csv", "test".getBytes());
     mockMvc
-        .perform(multipart("/upload").file(file).param("provider", "123").principal(principal))
-        .andExpect(status().isOk())
+        .perform(multipart("/upload").file(file).param("provider", "123").principal(principal)
+                        .param("selectedUser", "TestUser"))
+                .andExpect(status().isOk())
         .andExpect(view().name("pages/submission"));
   }
 
@@ -149,8 +154,9 @@ class BulkUploadControllerTest {
     MockMultipartFile file =
         new MockMultipartFile("fileUpload", "test.csv", "text/csv", "test".getBytes());
     mockMvc
-        .perform(multipart("/upload").file(file).param("provider", "123"))
-        .andExpect(status().isOk())
+        .perform(multipart("/upload").file(file).param("provider", "123")
+                        .param("selectedUser", "TestUser"))
+                .andExpect(status().isOk())
         .andExpect(model().attribute("selectedProvider", 123));
   }
 }

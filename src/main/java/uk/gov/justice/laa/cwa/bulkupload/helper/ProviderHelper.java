@@ -7,7 +7,12 @@ import org.springframework.ui.Model;
 import uk.gov.justice.laa.cwa.bulkupload.response.CwaVendorDto;
 import uk.gov.justice.laa.cwa.bulkupload.service.CwaUploadService;
 
-/** Helper class to fetch and populate providers in the model. */
+import java.util.List;
+
+/**
+ * Helper class to fetch and populate providers in the model.
+ */
+
 @Component
 public class ProviderHelper {
 

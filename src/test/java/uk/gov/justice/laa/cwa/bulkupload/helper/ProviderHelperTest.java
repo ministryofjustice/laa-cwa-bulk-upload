@@ -18,10 +18,12 @@ import uk.gov.justice.laa.cwa.bulkupload.service.CwaUploadService;
 
 class ProviderHelperTest {
 
-  private CwaUploadService cwaUploadService;
-  private ProviderHelper providerHelper;
-  private Model model;
-  private Principal principal;
+  private static final String USERNAME = "TESTUSER";
+
+    private CwaUploadService cwaUploadService;
+    private ProviderHelper providerHelper;
+    private Model model;
+    private Principal principal;
 
   @BeforeEach
   void setUp() {
@@ -35,19 +37,19 @@ class ProviderHelperTest {
   @Test
   void populateProviders_shouldAddProvidersToModel() {
     List<CwaVendorDto> providers = List.of(new CwaVendorDto());
-    when(cwaUploadService.getProviders("TESTUSER")).thenReturn(providers);
+    when(cwaUploadService.getProviders(USERNAME)).thenReturn(providers);
 
-    providerHelper.populateProviders(model, principal);
+    providerHelper.populateProviders(model, USERNAME);
 
-    verify(cwaUploadService).getProviders("TESTUSER");
+    verify(cwaUploadService).getProviders(USERNAME);
     verify(model).addAttribute("providers", providers);
   }
 
   @Test
   void populateProviders_shouldAddEmptyListIfNoProviders() {
-    when(cwaUploadService.getProviders("TESTUSER")).thenReturn(Collections.emptyList());
+    when(cwaUploadService.getProviders(USERNAME)).thenReturn(Collections.emptyList());
 
-    providerHelper.populateProviders(model, principal);
+    providerHelper.populateProviders(model, USERNAME);
 
     ArgumentCaptor<List> captor = ArgumentCaptor.forClass(List.class);
     verify(model).addAttribute(eq("providers"), captor.capture());
