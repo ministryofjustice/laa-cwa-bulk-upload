@@ -32,7 +32,8 @@
             </svg>
         </a>
     </div>
-    <div class="govuk-header__navigation">
+    <div class="govuk-header__content">
+        <span class="username" th:text="${selectedUser}"></span>
         <div sec:authorize="isAuthenticated()">
             <form th:action="@{/logout}" method="post">
                 <button type="submit" class="sign-in-button govuk-!-font-weight-bold">Sign out</button>

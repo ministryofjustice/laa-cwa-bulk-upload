@@ -33,13 +33,14 @@ public class SecurityConfig {
                         .requestMatchers("/assets/**", "/javascripts/**", "/stylesheets/**").permitAll()
                         .anyRequest().authenticated()
                 )
+                .csrf(Customizer.withDefaults())
                 .oauth2Login(Customizer.withDefaults())
                 .logout(logout -> logout
-                        .logoutUrl("/logout")
                         .logoutSuccessHandler(oidcLogoutSuccessHandler(clientRegistrationRepository))
                         .invalidateHttpSession(true)
                         .clearAuthentication(true)
                         .deleteCookies("JSESSIONID"));
+
         return http.build();
     }
 

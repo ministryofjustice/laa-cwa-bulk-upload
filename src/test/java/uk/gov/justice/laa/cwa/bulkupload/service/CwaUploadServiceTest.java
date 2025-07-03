@@ -1,8 +1,8 @@
 package uk.gov.justice.laa.cwa.bulkupload.service;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.ParameterizedTypeReference;
@@ -34,22 +34,8 @@ class CwaUploadServiceTest {
     @Mock
     private RestClient restClient;
 
-    @Mock
-    private TokenService tokenService;
-
+    @InjectMocks
     private CwaUploadService cwaUploadService;
-
-    @BeforeEach
-    void setUp() {
-        cwaUploadService = new CwaUploadService(restClient, tokenService);
-        try {
-            var field = CwaUploadService.class.getDeclaredField("cwaApiUrl");
-            field.setAccessible(true);
-            field.set(cwaUploadService, "http://localhost:8090");
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
 
     @Test
     void shouldSuccessfullyUploadFile() {
@@ -91,7 +77,7 @@ class CwaUploadServiceTest {
         MockMultipartFile file = new MockMultipartFile("file", "test.txt", MediaType.TEXT_PLAIN_VALUE, "test".getBytes());
         assertThatThrownBy(() -> cwaUploadService.uploadFile(file, "provider", null))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("userName cannot be null");
+                .hasMessageContaining("username cannot be null");
     }
 
     @Test
@@ -142,7 +128,7 @@ class CwaUploadServiceTest {
     void shouldThrowIfUserNameIsNullOnProcessSubmission() {
         assertThatThrownBy(() -> cwaUploadService.processSubmission("fileId", null, "provider"))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("userName cannot be null");
+                .hasMessageContaining("username cannot be null");
     }
 
     @Test
