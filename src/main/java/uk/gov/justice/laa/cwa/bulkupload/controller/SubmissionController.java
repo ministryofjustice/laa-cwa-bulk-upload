@@ -42,6 +42,9 @@ public class SubmissionController {
      */
     @PostMapping("/submit")
     public String submitFile(String fileId, String provider, Model model, Principal principal, String selectedUser) {
+        // @TODO: remove when LASSIE is integrated
+        model.addAttribute("selectedUser", selectedUser);
+
         String username = getUsername(principal, selectedUser);
 
         CwaSubmissionResponseDto cwaSubmissionResponseDto;
@@ -85,11 +88,10 @@ public class SubmissionController {
     }
 
     private String getUsername(Principal principal, String selectedUser) {
-        // @TODO: Uncomment the line below when the principal is ready to use
+        // @TODO: Use instead when LASSIE is integrated
         // String username = ((DefaultOidcUser) ((OAuth2AuthenticationToken) principal).getPrincipal())
-        // .getIdToken().getClaims().get("name");
+        // .getIdToken().getClaims().get("name").toUpperCase();
 
-        // @TODO: revise when LASSIE is integrated
-        return selectedUser;
+        return selectedUser.toUpperCase();
     }
 }

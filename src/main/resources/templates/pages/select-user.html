@@ -37,9 +37,9 @@
                                 th:classappend="${errors != null && errors.containsKey('provider') ? 'govuk-select--error' : ''}"
                                 th:aria-describedby="${errors != null && errors.containsKey('provider') ? 'provider-error' : ''}">
                             <option value="">choose option</option>
-                            <option value="DT_SCRIPT_USER4">DDT_SCRIPT_USER4</option>
-                            <option value="DT_SCRIPT_USER14">DDT_SCRIPT_USER14</option>
-                            <option value="DT_SCRIPT_USER19">DDT_SCRIPT_USER19</option>
+                            <option value="DT_SCRIPT_USER4">DT_SCRIPT_USER4</option>
+                            <option value="DT_SCRIPT_USER14">DT_SCRIPT_USER14</option>
+                            <option value="DT_SCRIPT_USER19">DT_SCRIPT_USER19</option>
                         </select>
                     </div>
                     <button type="submit" class="govuk-button" th:formaction="@{/select-user}"

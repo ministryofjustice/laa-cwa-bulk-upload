@@ -35,6 +35,8 @@ public class SearchController {
    */
   @PostMapping("/search")
   public String submitForm(String provider, String searchTerm, Model model, Principal principal, String selectedUser) {
+        // @TODO: remove when LASSIE is integrated
+        model.addAttribute("selectedUser", selectedUser);
         String username = getUsername(principal, selectedUser);
 
         Map<String, String> errors = new LinkedHashMap<>();
@@ -71,11 +73,8 @@ public class SearchController {
       return handleErrors(model, username, provider, searchTerm, errors);
     }
 
-        // @TODO: remove when LASSIE is integrated
-        model.addAttribute("selectedUser", selectedUser);
-
-    return "pages/submission-results";
-  }
+        return "pages/submission-results";
+    }
 
   /**
    * Handles errors during the search process and prepares the model for rendering the upload page.
@@ -108,18 +107,14 @@ public class SearchController {
         providerHelper.populateProviders(model, username);
         model.addAttribute("tab", "search");
 
-        // @TODO: remove when LASSIE is integrated
-        model.addAttribute("selectedUser", username);
-
         return "pages/upload";
     }
 
     private String getUsername(Principal principal, String selectedUser) {
-        // @TODO: Uncomment the line below when the principal is ready to use
+        // @TODO: Use instead when LASSIE is integrated
         // String username = ((DefaultOidcUser) ((OAuth2AuthenticationToken) principal).getPrincipal())
-        // .getIdToken().getClaims().get("name");
+        // .getIdToken().getClaims().get("name").toUpperCase();
 
-        // @TODO: revise when LASSIE is integrated
-        return selectedUser;
+        return selectedUser.toUpperCase();
     }
 }

@@ -39,7 +39,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class SubmissionControllerTest {
     private static final String FILE_ID = "file123";
     private static final String PROVIDER = "provider1";
-    private static final String TEST_USER = "TestUser";
+    private static final String TEST_USER = "TESTUSER";
 
   @Autowired private MockMvc mockMvc;
 

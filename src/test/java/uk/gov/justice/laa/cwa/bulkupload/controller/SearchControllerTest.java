@@ -30,7 +30,6 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.argThat;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.eq;
@@ -42,7 +41,7 @@ class SearchControllerTest {
 
   private static final String PROVIDER = "1";
     private static final String SEARCH_TERM = "ref";
-    private static final String TEST_USER = "TestUser";
+    private static final String TEST_USER = "TESTUSER";
 
     @Mock
     private CwaUploadService cwaUploadService;
@@ -58,8 +57,10 @@ class SearchControllerTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        when(principal.getName()).thenReturn("USER");
-        doNothing().when(providerHelper).populateProviders(any(Model.class), anyString());
+        when(principal.getName()).thenReturn(TEST_USER);
+        doNothing().when(providerHelper).populateProviders(any(Model.class), eq(TEST_USER));
+        when(cwaUploadService.getProviders(TEST_USER)).thenReturn(Collections.emptyList());
+        when(model.asMap()).thenReturn(Collections.emptyMap());
     }
 
   @Test
