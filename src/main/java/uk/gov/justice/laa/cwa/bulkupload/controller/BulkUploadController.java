@@ -122,7 +122,7 @@ public class BulkUploadController {
     private String showErrorOnUpload(Model model, Principal principal, String provider, Map<String, String> errors) {
         model.addAttribute("errors", errors);
         providerHelper.populateProviders(model, principal);
-        model.addAttribute("selectedProvider", !StringUtils.hasText(provider) ? 0 : Integer.parseInt(provider));
+        model.addAttribute("selectedProvider", StringUtils.hasText(provider) ? Integer.parseInt(provider) : 0);
         return "pages/upload";
     }
 }
