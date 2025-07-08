@@ -71,16 +71,20 @@ cd laa-cwa-bulk-upload
 ./gradlew clean build
 ```
 ### Wiremock
+```
 export WIREMOCK_PORT=8090
 export WIREMOCK_HOST=localhost
+```
 All Wiremock stubs are located in `src/wiremock/mappings/cwa-service`
 Before running the application, ensure Wiremock is running on port 8090.
 You can start it using Docker compose  : `docker-compose up` (from the root of the project)
 Ensure cwa-api.url in your local application yaml is set to 'http://localhost:8090' to point to wiremock.
 
 ### Local Application Properties
+```
 export CWA_API_URL=http://localhost:8090
 export CWA_API_TIMEOUT=20
+```
 
 ### Run
 
