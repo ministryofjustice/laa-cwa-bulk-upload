@@ -67,7 +67,7 @@ public class BulkUploadController {
      * @return the upload results page
      */
     @PostMapping("/upload")
-    public String performUpload(@RequestParam("fileUpload") MultipartFile file, String provider, Model model, Principal principal) {
+    public String performUpload(@RequestParam("fileUpload") MultipartFile file, String provider, boolean nilSubmission, Model model, Principal principal) {
         long maxFileSize = DataSize.parse(fileSizeLimit).toBytes();
         Map<String, String> errors = new LinkedHashMap<>();
 
@@ -100,6 +100,7 @@ public class BulkUploadController {
             CwaUploadResponseDto cwaUploadResponseDto = cwaUploadService.uploadFile(file, provider, principal.getName().toUpperCase());
             model.addAttribute("fileId", cwaUploadResponseDto.getFileId());
             model.addAttribute("provider", provider);
+            model.addAttribute("nilSubmission", nilSubmission);
             log.info("CWA Upload response fileId: {}", cwaUploadResponseDto.getFileId());
         } catch (Exception e) {
             log.error("Failed to upload file to CWA with message: {}", e.getMessage());

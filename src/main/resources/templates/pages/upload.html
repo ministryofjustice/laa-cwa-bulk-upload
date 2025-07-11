@@ -64,6 +64,19 @@
                         <div class="govuk-tabs__panel" id="upload-file">
                             <h2 class="govuk-heading-l">Upload a file</h2>
 
+                            <div class="govuk-form-group">
+
+                                <div class="govuk-checkboxes" data-module="govuk-checkboxes">
+                                    <div class="govuk-checkboxes__item">
+                                        <input class="govuk-checkboxes__input" id="nilSubmission" name="nilSubmission"
+                                               type="checkbox" value="true">
+                                        <label class="govuk-label govuk-checkboxes__label" for="nilSubmission">
+                                            Please check this box when uploading a Nil submission file
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
                             <div class="govuk-form-group"
                                  th:classappend="${errors != null && errors.containsKey('fileUpload') ? 'govuk-form-group--error' : ''}">
                                 <label class="govuk-label" for="file-upload">Select a file to upload</label>
