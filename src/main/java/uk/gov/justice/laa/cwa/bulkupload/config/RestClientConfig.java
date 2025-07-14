@@ -27,7 +27,7 @@ public class RestClientConfig {
      * @return the configured RestClient instance
      */
     @Bean
-    public RestClient restClient() {
+    RestClient restClient() {
         HttpClient httpClient = HttpClient.newBuilder()
                 .connectTimeout(Duration.ofMillis(connectTimeout))
                 .build();

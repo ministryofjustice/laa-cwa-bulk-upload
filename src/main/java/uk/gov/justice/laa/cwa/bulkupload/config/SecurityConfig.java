@@ -23,7 +23,7 @@ public class SecurityConfig {
      * @return the UserDetailsService instance
      */
     @Bean
-    public UserDetailsService userDetailsService() {
+    UserDetailsService userDetailsService() {
         var user = User
                 .withUsername("ERNESTCOHEN")
                 .password("{noop}password") // {noop} means no password encoder
@@ -78,14 +78,14 @@ public class SecurityConfig {
      * @throws Exception if an error occurs during configuration
      */
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http
-                .authorizeHttpRequests((requests) -> requests
+                .authorizeHttpRequests(requests -> requests
                         .requestMatchers("/assets/**", "/javascripts/**", "/stylesheets/**").permitAll()
                         .anyRequest().authenticated()
                 )
-                .formLogin((form) -> form
+                .formLogin(form -> form
                         .loginPage("/login")
                         .permitAll()
                 )
