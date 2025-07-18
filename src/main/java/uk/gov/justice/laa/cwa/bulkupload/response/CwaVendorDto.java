@@ -8,8 +8,9 @@ import lombok.Data;
  */
 @Data
 public class CwaVendorDto {
-    @JsonProperty("VENDOR_NAME")
-    String vendorName;
-    @JsonProperty("VENDOR_ID")
-    int vendorId;
+
+  @JsonProperty("VENDOR_NAME")
+  String vendorName;
+  @JsonProperty("VENDOR_ID")
+  int vendorId;
 }
