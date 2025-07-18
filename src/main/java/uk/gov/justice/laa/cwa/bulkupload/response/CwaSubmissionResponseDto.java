@@ -7,7 +7,8 @@ import lombok.Data;
  */
 @Data
 public class CwaSubmissionResponseDto {
-    private String status;
-    private String message;
-    private String data;
+
+  private String status;
+  private String message;
+  private String data;
 }

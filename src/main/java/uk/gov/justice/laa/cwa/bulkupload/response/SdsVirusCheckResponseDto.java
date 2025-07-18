@@ -7,6 +7,7 @@ import lombok.Data;
  */
 @Data
 public class SdsVirusCheckResponseDto {
-    private String detail;
-    private String success;
+
+  private String detail;
+  private String success;
 }

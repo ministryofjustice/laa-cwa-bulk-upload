@@ -8,8 +8,9 @@ import lombok.Data;
  */
 @Data
 public class CwaUploadResponseDto {
-    @JsonProperty("am_bulk_file_id")
-    private String fileId;
-    @JsonProperty("message")
-    private String message;
+
+  @JsonProperty("am_bulk_file_id")
+  private String fileId;
+  @JsonProperty("message")
+  private String message;
 }

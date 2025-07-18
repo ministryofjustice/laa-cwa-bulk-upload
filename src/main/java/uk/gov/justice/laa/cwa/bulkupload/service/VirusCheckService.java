@@ -19,35 +19,35 @@ import uk.gov.justice.laa.cwa.bulkupload.response.SdsVirusCheckResponseDto;
 @RequiredArgsConstructor
 public class VirusCheckService {
 
-    @Value("${sds-api.url}")
-    private String sdsApiUrl;
+  private final RestClient restClient;
+  private final TokenService tokenService;
+  @Value("${sds-api.url}")
+  private String sdsApiUrl;
 
-    private final RestClient restClient;
-    private final TokenService tokenService;
-
-    /**
-     * Perform a virus check for the given file.
-     *
-     * @param file the file
-     * @return the result
-     */
-    public SdsVirusCheckResponseDto checkVirus(MultipartFile file) {
-        if (file == null) {
-            throw new VirusCheckException("File cannot be null");
-        }
-
-        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-        body.add("file", file.getResource());
-        SdsVirusCheckResponseDto sdsVirusCheckResponseDto = restClient.put()
-                .uri(sdsApiUrl + "/virus_check_file")
-                .contentType(MediaType.MULTIPART_FORM_DATA)
-                .header("Authorization", "Bearer " + tokenService.getSdsAccessToken())
-                .body(body)
-                .retrieve()
-                .body(SdsVirusCheckResponseDto.class);
-        if (null == sdsVirusCheckResponseDto || !StringUtils.hasText(sdsVirusCheckResponseDto.getSuccess())) {
-            throw new VirusCheckException("Virus check failed");
-        }
-        return sdsVirusCheckResponseDto;
+  /**
+   * Perform a virus check for the given file.
+   *
+   * @param file the file
+   * @return the result
+   */
+  public SdsVirusCheckResponseDto checkVirus(MultipartFile file) {
+    if (file == null) {
+      throw new VirusCheckException("File cannot be null");
     }
+
+    MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+    body.add("file", file.getResource());
+    SdsVirusCheckResponseDto sdsVirusCheckResponseDto = restClient.put()
+        .uri(sdsApiUrl + "/virus_check_file")
+        .contentType(MediaType.MULTIPART_FORM_DATA)
+        .header("Authorization", "Bearer " + tokenService.getSdsAccessToken())
+        .body(body)
+        .retrieve()
+        .body(SdsVirusCheckResponseDto.class);
+    if (null == sdsVirusCheckResponseDto || !StringUtils.hasText(
+        sdsVirusCheckResponseDto.getSuccess())) {
+      throw new VirusCheckException("Virus check failed");
+    }
+    return sdsVirusCheckResponseDto;
+  }
 }

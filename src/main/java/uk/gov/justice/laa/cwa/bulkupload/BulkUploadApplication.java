@@ -10,12 +10,13 @@ import org.springframework.cache.annotation.EnableCaching;
 @SpringBootApplication
 @EnableCaching
 public class BulkUploadApplication {
-    /**
-     * The application main method.
-     *
-     * @param args the application arguments.
-     */
-    public static void main(String[] args) {
-        SpringApplication.run(BulkUploadApplication.class, args);
-    }
+
+  /**
+   * The application main method.
+   *
+   * @param args the application arguments.
+   */
+  public static void main(String[] args) {
+    SpringApplication.run(BulkUploadApplication.class, args);
+  }
 }
