@@ -8,9 +8,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.JdkClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
 
-/**
- * Rest Client configuration for the application.
- */
+/** Rest Client configuration for the application. */
 @Configuration
 public class RestClientConfig {
 
@@ -27,15 +25,12 @@ public class RestClientConfig {
    */
   @Bean
   public RestClient restClient() {
-    HttpClient httpClient = HttpClient.newBuilder()
-        .connectTimeout(Duration.ofMillis(connectTimeout))
-        .build();
+    HttpClient httpClient =
+        HttpClient.newBuilder().connectTimeout(Duration.ofMillis(connectTimeout)).build();
 
     JdkClientHttpRequestFactory requestFactory = new JdkClientHttpRequestFactory(httpClient);
     requestFactory.setReadTimeout(Duration.ofMillis(readTimeout));
 
-    return RestClient.builder()
-        .requestFactory(requestFactory)
-        .build();
+    return RestClient.builder().requestFactory(requestFactory).build();
   }
 }

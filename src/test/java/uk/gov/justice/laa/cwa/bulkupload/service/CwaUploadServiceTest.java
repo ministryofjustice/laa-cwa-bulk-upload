@@ -30,11 +30,9 @@ import uk.gov.justice.laa.cwa.bulkupload.response.CwaVendorDto;
 @ExtendWith(MockitoExtension.class)
 class CwaUploadServiceTest {
 
-  @Mock
-  private RestClient restClient;
+  @Mock private RestClient restClient;
 
-  @Mock
-  private TokenService tokenService;
+  @Mock private TokenService tokenService;
 
   private CwaUploadService cwaUploadService;
 

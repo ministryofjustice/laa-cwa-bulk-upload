@@ -6,9 +6,7 @@ import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.stereotype.Service;
 import uk.gov.justice.laa.cwa.bulkupload.provider.TokenProvider;
 
-/**
- * Service class for getting an access token.
- */
+/** Service class for getting an access token. */
 @Service
 @RequiredArgsConstructor
 public class TokenService {
@@ -33,8 +31,8 @@ public class TokenService {
   }
 
   private boolean isValidToken(OAuth2AccessToken accessToken) {
-    return accessToken != null && accessToken.getExpiresAt() != null
+    return accessToken != null
+        && accessToken.getExpiresAt() != null
         && accessToken.getExpiresAt().isAfter(Instant.now());
   }
-
 }

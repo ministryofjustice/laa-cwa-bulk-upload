@@ -15,9 +15,7 @@ import uk.gov.justice.laa.cwa.bulkupload.response.CwaUploadErrorResponseDto;
 import uk.gov.justice.laa.cwa.bulkupload.response.CwaUploadSummaryResponseDto;
 import uk.gov.justice.laa.cwa.bulkupload.service.CwaUploadService;
 
-/**
- * Controller for handling search requests related to bulk uploads.
- */
+/** Controller for handling search requests related to bulk uploads. */
 @Slf4j
 @RequiredArgsConstructor
 @Controller
@@ -29,10 +27,10 @@ public class SearchController {
   /**
    * Handles the search form submission and retrieves upload summaries and errors.
    *
-   * @param provider   the selected provider
+   * @param provider the selected provider
    * @param searchTerm the search term (file reference)
-   * @param model      the model to add attributes to
-   * @param principal  the authenticated user principal
+   * @param model the model to add attributes to
+   * @param principal the authenticated user principal
    * @return the name of the view to render
    */
   @PostMapping("/search")
@@ -63,9 +61,7 @@ public class SearchController {
 
     try {
       List<CwaUploadErrorResponseDto> uploadErrors =
-          cwaUploadService.getUploadErrors(
-              searchTerm, principal.getName().toUpperCase(),
-              provider);
+          cwaUploadService.getUploadErrors(searchTerm, principal.getName().toUpperCase(), provider);
       model.addAttribute("errors", uploadErrors);
     } catch (Exception e) {
       log.error("Error retrieving upload errors: {}", e.getMessage());
@@ -79,16 +75,19 @@ public class SearchController {
   /**
    * Handles errors during the search process and prepares the model for rendering the upload page.
    *
-   * @param model      the model to add attributes to
-   * @param principal  the authenticated user principal
-   * @param provider   the selected provider
+   * @param model the model to add attributes to
+   * @param principal the authenticated user principal
+   * @param provider the selected provider
    * @param searchTerm the search term (file reference)
-   * @param errors     a map of error messages
+   * @param errors a map of error messages
    * @return the name of the view to render
    */
-
-  private String handleErrors(Model model, Principal principal, String provider,
-      String searchTerm, Map<String, String> errors) {
+  private String handleErrors(
+      Model model,
+      Principal principal,
+      String provider,
+      String searchTerm,
+      Map<String, String> errors) {
     model.addAttribute("errors", errors);
     if (StringUtils.hasText(provider)) {
       try {

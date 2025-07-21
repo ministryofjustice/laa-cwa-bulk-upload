@@ -25,47 +25,29 @@ public class SecurityConfig {
    */
   @Bean
   public UserDetailsService userDetailsService() {
-    var user = User
-        .withUsername("ERNESTCOHEN")
-        .password("{noop}password") // {noop} means no password encoder
-        .roles("USER")
-        .build();
+    var user =
+        User.withUsername("ERNESTCOHEN")
+            .password("{noop}password") // {noop} means no password encoder
+            .roles("USER")
+            .build();
 
-    var user4 = User
-        .withUsername("DT_SCRIPT_USER4")
-        .password("{noop}password")
-        .roles("USER")
-        .build();
+    var user4 =
+        User.withUsername("DT_SCRIPT_USER4").password("{noop}password").roles("USER").build();
 
-    var user6 = User
-        .withUsername("DT_SCRIPT_USER6")
-        .password("{noop}password")
-        .roles("USER")
-        .build();
+    var user6 =
+        User.withUsername("DT_SCRIPT_USER6").password("{noop}password").roles("USER").build();
 
-    var user14 = User
-        .withUsername("DT_SCRIPT_USER14")
-        .password("{noop}password")
-        .roles("USER")
-        .build();
+    var user14 =
+        User.withUsername("DT_SCRIPT_USER14").password("{noop}password").roles("USER").build();
 
-    var user19 = User
-        .withUsername("DT_SCRIPT_USER19")
-        .password("{noop}password")
-        .roles("USER")
-        .build();
+    var user19 =
+        User.withUsername("DT_SCRIPT_USER19").password("{noop}password").roles("USER").build();
 
-    var user22 = User
-        .withUsername("DT_SCRIPT_USER22")
-        .password("{noop}password")
-        .roles("USER")
-        .build();
+    var user22 =
+        User.withUsername("DT_SCRIPT_USER22").password("{noop}password").roles("USER").build();
 
-    var user23 = User
-        .withUsername("DT_SCRIPT_USER23")
-        .password("{noop}password")
-        .roles("USER")
-        .build();
+    var user23 =
+        User.withUsername("DT_SCRIPT_USER23").password("{noop}password").roles("USER").build();
     return new InMemoryUserDetailsManager(user, user4, user6, user14, user19, user22, user23);
   }
 
@@ -80,20 +62,17 @@ public class SecurityConfig {
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-    http
-        .authorizeHttpRequests((requests) -> requests
-            .requestMatchers("/assets/**", "/javascripts/**", "/stylesheets/**", "/webjars/**")
-            .permitAll()
-            .anyRequest().authenticated()
-        )
-        .formLogin((form) -> form
-            .loginPage("/login")
-            .permitAll()
-        )
-        .logout(
-            httpSecurityLogoutConfigurer -> httpSecurityLogoutConfigurer.logoutSuccessUrl("/"));
+    http.authorizeHttpRequests(
+            (requests) ->
+                requests
+                    .requestMatchers(
+                        "/assets/**", "/javascripts/**", "/stylesheets/**", "/webjars/**")
+                    .permitAll()
+                    .anyRequest()
+                    .authenticated())
+        .formLogin((form) -> form.loginPage("/login").permitAll())
+        .logout(httpSecurityLogoutConfigurer -> httpSecurityLogoutConfigurer.logoutSuccessUrl("/"));
 
     return http.build();
-
   }
 }

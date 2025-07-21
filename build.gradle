@@ -5,6 +5,7 @@ plugins {
     id 'jacoco'
     id 'io.freefair.lombok' version '8.14'
     id 'checkstyle'
+    id("com.diffplug.spotless") version "7.0.4"
 }
 
 checkstyle {
@@ -88,3 +89,13 @@ jacocoTestCoverageVerification {
 }
 
 check.dependsOn jacocoTestCoverageVerification
+
+spotless {
+    java {
+        target 'src/*/java/**/*.java'
+        importOrder()
+        removeUnusedImports()
+        cleanthat()
+        googleJavaFormat()
+    }
+}

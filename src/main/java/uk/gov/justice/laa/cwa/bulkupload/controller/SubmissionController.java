@@ -18,16 +18,14 @@ import uk.gov.justice.laa.cwa.bulkupload.response.CwaUploadErrorResponseDto;
 import uk.gov.justice.laa.cwa.bulkupload.response.CwaUploadSummaryResponseDto;
 import uk.gov.justice.laa.cwa.bulkupload.service.CwaUploadService;
 
-/**
- * Controller for handling the submission of bulk upload.
- */
-
+/** Controller for handling the submission of bulk upload. */
 @Slf4j
 @RequiredArgsConstructor
 @Controller
 public class SubmissionController {
 
   private final CwaUploadService cwaUploadService;
+
   @Value("${cwa-api.timeout}")
   private int cwaApiTimeout;
 
@@ -35,9 +33,9 @@ public class SubmissionController {
    * Handles the submission of a file for bulk upload. This method processes the file submission,
    * validates it, and returns the results.
    *
-   * @param fileId   the ID of the file to be submitted.
+   * @param fileId the ID of the file to be submitted.
    * @param provider the provider to be used for the submission.
-   * @param model    the model to be populated with providers and error messages.
+   * @param model the model to be populated with providers and error messages.
    * @return the submission results page or an error page if validation fails.
    */
   @PostMapping("/submit")
@@ -48,14 +46,14 @@ public class SubmissionController {
     ExecutorService executor = Executors.newSingleThreadExecutor();
     try {
       Future<CwaSubmissionResponseDto> future =
-          executor.submit(() -> cwaUploadService.processSubmission(
-              fileId,
-              principal.getName().toUpperCase(), provider));
+          executor.submit(
+              () ->
+                  cwaUploadService.processSubmission(
+                      fileId, principal.getName().toUpperCase(), provider));
       cwaSubmissionResponseDto = future.get(cwaApiTimeout, TimeUnit.SECONDS);
     } catch (TimeoutException e) {
       // Handle timeout
-      log.error(
-          "Submission timeout after {} secs with message {}", cwaApiTimeout, e.getMessage());
+      log.error("Submission timeout after {} secs with message {}", cwaApiTimeout, e.getMessage());
       model.addAttribute("fileId", fileId);
       return "pages/submission-timeout";
     } catch (Exception e) {
@@ -75,13 +73,11 @@ public class SubmissionController {
       return "pages/submission-failure";
     }
 
-    if (cwaSubmissionResponseDto == null || !"success".equalsIgnoreCase(
-        cwaSubmissionResponseDto.getStatus())) {
+    if (cwaSubmissionResponseDto == null
+        || !"success".equalsIgnoreCase(cwaSubmissionResponseDto.getStatus())) {
       try {
         List<CwaUploadErrorResponseDto> errors =
-            cwaUploadService.getUploadErrors(
-                fileId, principal.getName().toUpperCase(),
-                provider);
+            cwaUploadService.getUploadErrors(fileId, principal.getName().toUpperCase(), provider);
         model.addAttribute("errors", errors);
       } catch (Exception e) {
         log.error("Error retrieving upload errors: {}", e.getMessage());
@@ -90,6 +86,4 @@ public class SubmissionController {
     }
     return "pages/submission-results";
   }
-
 }
-

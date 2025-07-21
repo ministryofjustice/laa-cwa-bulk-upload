@@ -18,14 +18,11 @@ import uk.gov.justice.laa.cwa.bulkupload.provider.TokenProvider;
 @ExtendWith(MockitoExtension.class)
 class TokenServiceTest {
 
-  @Mock
-  TokenProvider tokenProvider;
+  @Mock TokenProvider tokenProvider;
 
-  @Mock
-  OAuth2AccessToken accessToken;
+  @Mock OAuth2AccessToken accessToken;
 
-  @InjectMocks
-  TokenService tokenService;
+  @InjectMocks TokenService tokenService;
 
   @Test
   void shouldGetSdsAccessToken() {
@@ -54,5 +51,4 @@ class TokenServiceTest {
     verify(tokenProvider, times(2)).getTokenFromProvider();
     verify(tokenProvider).evictToken();
   }
-
 }

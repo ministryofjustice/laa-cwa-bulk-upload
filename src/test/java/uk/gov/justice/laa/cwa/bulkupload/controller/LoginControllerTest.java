@@ -14,13 +14,10 @@ import org.springframework.test.web.servlet.MockMvc;
 @AutoConfigureMockMvc(addFilters = false)
 class LoginControllerTest {
 
-  @Autowired
-  private MockMvc mockMvc;
+  @Autowired private MockMvc mockMvc;
 
   @Test
   void shouldReturnLoginView() throws Exception {
-    mockMvc.perform(get("/login"))
-        .andExpect(status().isOk())
-        .andExpect(view().name("pages/login"));
+    mockMvc.perform(get("/login")).andExpect(status().isOk()).andExpect(view().name("pages/login"));
   }
 }

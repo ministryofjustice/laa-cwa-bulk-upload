@@ -28,5 +28,4 @@ public class ApplicationConfig implements WebMvcConfigurer {
         .resourceChain(true)
         .addResolver(new LiteWebJarsResourceResolver());
   }
-
 }

@@ -26,17 +26,12 @@ import uk.gov.justice.laa.cwa.bulkupload.service.CwaUploadService;
 @AutoConfigureMockMvc(addFilters = false)
 class SearchControllerTest {
 
-  @Mock
-  private CwaUploadService cwaUploadService;
-  @Mock
-  private ProviderHelper providerHelper;
-  @Mock
-  private Model model;
-  @Mock
-  private Principal principal;
+  @Mock private CwaUploadService cwaUploadService;
+  @Mock private ProviderHelper providerHelper;
+  @Mock private Model model;
+  @Mock private Principal principal;
 
-  @InjectMocks
-  private SearchController searchController;
+  @InjectMocks private SearchController searchController;
 
   @BeforeEach
   void setUp() {
@@ -47,16 +42,18 @@ class SearchControllerTest {
   @Test
   void submitForm_shouldReturnError_whenProviderIsMissing() {
     String view = searchController.submitForm("", "ref", model, principal);
-    verify(model).addAttribute(
-        eq("errors"), argThat(errors -> ((Map<?, ?>) errors).containsKey("provider")));
+    verify(model)
+        .addAttribute(
+            eq("errors"), argThat(errors -> ((Map<?, ?>) errors).containsKey("provider")));
     assertEquals("pages/upload", view);
   }
 
   @Test
   void submitForm_shouldReturnError_whenSearchTermIsInvalid() {
     String view = searchController.submitForm("1", "", model, principal);
-    verify(model).addAttribute(
-        eq("errors"), argThat(errors -> ((Map<?, ?>) errors).containsKey("searchTerm")));
+    verify(model)
+        .addAttribute(
+            eq("errors"), argThat(errors -> ((Map<?, ?>) errors).containsKey("searchTerm")));
     assertEquals("pages/upload", view);
   }
 
@@ -65,8 +62,8 @@ class SearchControllerTest {
     when(cwaUploadService.getUploadSummary(anyString(), anyString(), anyString()))
         .thenThrow(new RuntimeException("fail"));
     String view = searchController.submitForm("1", "ref", model, principal);
-    verify(model).addAttribute(
-        eq("errors"), argThat(errors -> ((Map<?, ?>) errors).containsKey("search")));
+    verify(model)
+        .addAttribute(eq("errors"), argThat(errors -> ((Map<?, ?>) errors).containsKey("search")));
     assertEquals("pages/upload", view);
   }
 
@@ -74,10 +71,10 @@ class SearchControllerTest {
   void submitForm_shouldReturnSubmissionResults_whenNoErrors() {
     List<CwaUploadSummaryResponseDto> summary = Collections.emptyList();
     List<CwaUploadErrorResponseDto> uploadErrors = Collections.emptyList();
-    when(cwaUploadService.getUploadSummary(anyString(), anyString(), anyString())).thenReturn(
-        summary);
-    when(cwaUploadService.getUploadErrors(anyString(), anyString(), anyString())).thenReturn(
-        uploadErrors);
+    when(cwaUploadService.getUploadSummary(anyString(), anyString(), anyString()))
+        .thenReturn(summary);
+    when(cwaUploadService.getUploadErrors(anyString(), anyString(), anyString()))
+        .thenReturn(uploadErrors);
 
     String view = searchController.submitForm("1", "ref", model, principal);
 

@@ -21,9 +21,7 @@ import uk.gov.justice.laa.cwa.bulkupload.response.CwaUploadResponseDto;
 import uk.gov.justice.laa.cwa.bulkupload.service.CwaUploadService;
 import uk.gov.justice.laa.cwa.bulkupload.service.VirusCheckService;
 
-/**
- * Controller for handling the bulk upload requests.
- */
+/** Controller for handling the bulk upload requests. */
 @Slf4j
 @RequiredArgsConstructor
 @Controller
@@ -32,6 +30,7 @@ public class BulkUploadController {
   private final VirusCheckService virusCheckService;
   private final CwaUploadService cwaUploadService;
   private final ProviderHelper providerHelper;
+
   @Value("${upload-max-file-size:10MB}")
   private String fileSizeLimit;
 
@@ -45,8 +44,7 @@ public class BulkUploadController {
     try {
       providerHelper.populateProviders(model, principal);
     } catch (HttpClientErrorException e) {
-      log.error(
-          "HTTP client error fetching providers from CWA with message: {} ", e.getMessage());
+      log.error("HTTP client error fetching providers from CWA with message: {} ", e.getMessage());
       if (e.getStatusCode() == HttpStatus.FORBIDDEN) {
         return "pages/upload-forbidden";
       } else {
@@ -66,8 +64,11 @@ public class BulkUploadController {
    * @return the upload results page
    */
   @PostMapping("/upload")
-  public String performUpload(@RequestParam("fileUpload") MultipartFile file, String provider,
-      Model model, Principal principal) {
+  public String performUpload(
+      @RequestParam("fileUpload") MultipartFile file,
+      String provider,
+      Model model,
+      Principal principal) {
     long maxFileSize = DataSize.parse(fileSizeLimit).toBytes();
     Map<String, String> errors = new LinkedHashMap<>();
 
@@ -114,14 +115,14 @@ public class BulkUploadController {
   /**
    * Displays the error messages on the upload page.
    *
-   * @param model     the model to be populated with error messages
+   * @param model the model to be populated with error messages
    * @param principal the authenticated user principal
-   * @param provider  the selected provider
-   * @param errors    the map of error messages
+   * @param provider the selected provider
+   * @param errors the map of error messages
    * @return the upload page with error messages
    */
-  private String showErrorOnUpload(Model model, Principal principal, String provider,
-      Map<String, String> errors) {
+  private String showErrorOnUpload(
+      Model model, Principal principal, String provider, Map<String, String> errors) {
     model.addAttribute("errors", errors);
     providerHelper.populateProviders(model, principal);
     model.addAttribute(

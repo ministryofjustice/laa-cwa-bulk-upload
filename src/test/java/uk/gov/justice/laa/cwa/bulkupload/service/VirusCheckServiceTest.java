@@ -24,11 +24,9 @@ import uk.gov.justice.laa.cwa.bulkupload.response.SdsVirusCheckResponseDto;
 @ExtendWith(MockitoExtension.class)
 class VirusCheckServiceTest {
 
-  @Mock
-  private RestClient restClient;
+  @Mock private RestClient restClient;
 
-  @Mock
-  private TokenService tokenService;
+  @Mock private TokenService tokenService;
 
   private VirusCheckService virusCheckService;
 
@@ -52,18 +50,15 @@ class VirusCheckServiceTest {
     when(restClient.put()).thenReturn(requestBodyUriSpec);
     when(requestBodyUriSpec.uri(endsWith("/virus_check_file"))).thenReturn(requestBodySpec);
     when(requestBodySpec.contentType(MediaType.MULTIPART_FORM_DATA)).thenReturn(requestBodySpec);
-    when(requestBodySpec.header("Authorization", "Bearer " + mockToken)).thenReturn(
-        requestBodySpec);
+    when(requestBodySpec.header("Authorization", "Bearer " + mockToken))
+        .thenReturn(requestBodySpec);
     when(requestBodySpec.body(any(MultiValueMap.class))).thenReturn(requestBodySpec);
     when(requestBodySpec.retrieve()).thenReturn(responseSpec);
     when(responseSpec.body(SdsVirusCheckResponseDto.class)).thenReturn(expectedResponse);
 
-    MockMultipartFile file = new MockMultipartFile(
-        "file",
-        "test.txt",
-        MediaType.TEXT_PLAIN_VALUE,
-        "test content".getBytes()
-    );
+    MockMultipartFile file =
+        new MockMultipartFile(
+            "file", "test.txt", MediaType.TEXT_PLAIN_VALUE, "test content".getBytes());
 
     // When
     SdsVirusCheckResponseDto result = virusCheckService.checkVirus(file);
@@ -86,12 +81,9 @@ class VirusCheckServiceTest {
   @Test
   void shouldHandleRestClientException() {
     // Given
-    MockMultipartFile file = new MockMultipartFile(
-        "file",
-        "test.txt",
-        MediaType.TEXT_PLAIN_VALUE,
-        "test content".getBytes()
-    );
+    MockMultipartFile file =
+        new MockMultipartFile(
+            "file", "test.txt", MediaType.TEXT_PLAIN_VALUE, "test content".getBytes());
 
     RestClient.RequestBodyUriSpec requestBodyUriSpec = mock(RestClient.RequestBodyUriSpec.class);
     RestClient.RequestBodySpec requestBodySpec = mock(RestClient.RequestBodySpec.class);
@@ -111,4 +103,3 @@ class VirusCheckServiceTest {
         .hasMessage("Failed to connect to server");
   }
 }
-

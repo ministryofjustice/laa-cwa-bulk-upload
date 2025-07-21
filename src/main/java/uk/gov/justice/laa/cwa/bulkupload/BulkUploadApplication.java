@@ -4,9 +4,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cache.annotation.EnableCaching;
 
-/**
- * Entry point for the Bulk Upload application.
- */
+/** Entry point for the Bulk Upload application. */
 @SpringBootApplication
 @EnableCaching
 public class BulkUploadApplication {
