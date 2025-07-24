@@ -20,9 +20,7 @@ import uk.gov.justice.laa.cwa.bulkupload.response.CwaVendorDto;
 @RequiredArgsConstructor
 public class CwaUploadService {
 
-
-
-    private final RestClient restClient;
+  private final RestClient restClient;
 
   @Value("${cwa-api.url}")
   private String cwaApiUrl;

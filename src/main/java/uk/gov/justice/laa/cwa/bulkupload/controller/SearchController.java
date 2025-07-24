@@ -34,12 +34,13 @@ public class SearchController {
    * @return the name of the view to render
    */
   @PostMapping("/search")
-  public String submitForm(String provider, String searchTerm, Model model, Principal principal, String selectedUser) {
-        // @TODO: remove when LASSIE is integrated
-        model.addAttribute("selectedUser", selectedUser);
-        String username = getUsername(principal, selectedUser);
+  public String submitForm(
+      String provider, String searchTerm, Model model, Principal principal, String selectedUser) {
+    // @TODO: remove when LASSIE is integrated
+    model.addAttribute("selectedUser", selectedUser);
+    String username = getUsername(principal, selectedUser);
 
-        Map<String, String> errors = new LinkedHashMap<>();
+    Map<String, String> errors = new LinkedHashMap<>();
 
     if (!StringUtils.hasText(provider)) {
       errors.put("provider", "Please select a provider");
@@ -73,8 +74,8 @@ public class SearchController {
       return handleErrors(model, username, provider, searchTerm, errors);
     }
 
-        return "pages/submission-results";
-    }
+    return "pages/submission-results";
+  }
 
   /**
    * Handles errors during the search process and prepares the model for rendering the upload page.
@@ -101,20 +102,20 @@ public class SearchController {
       }
     }
 
-        if (StringUtils.hasText(searchTerm)) {
-            model.addAttribute("searchTerm", searchTerm);
-        }
-        providerHelper.populateProviders(model, username);
-        model.addAttribute("tab", "search");
-
-        return "pages/upload";
+    if (StringUtils.hasText(searchTerm)) {
+      model.addAttribute("searchTerm", searchTerm);
     }
+    providerHelper.populateProviders(model, username);
+    model.addAttribute("tab", "search");
 
-    private String getUsername(Principal principal, String selectedUser) {
-        // @TODO: Use instead when LASSIE is integrated
-        // String username = ((DefaultOidcUser) ((OAuth2AuthenticationToken) principal).getPrincipal())
-        // .getIdToken().getClaims().get("name").toUpperCase();
+    return "pages/upload";
+  }
 
-        return selectedUser.toUpperCase();
-    }
+  private String getUsername(Principal principal, String selectedUser) {
+    // @TODO: Use instead when LASSIE is integrated
+    // String username = ((DefaultOidcUser) ((OAuth2AuthenticationToken) principal).getPrincipal())
+    // .getIdToken().getClaims().get("name").toUpperCase();
+
+    return selectedUser.toUpperCase();
+  }
 }

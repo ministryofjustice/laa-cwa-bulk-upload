@@ -1,18 +1,12 @@
 package uk.gov.justice.laa.cwa.bulkupload.helper;
 
-import java.security.Principal;
 import java.util.List;
 import org.springframework.stereotype.Component;
 import org.springframework.ui.Model;
 import uk.gov.justice.laa.cwa.bulkupload.response.CwaVendorDto;
 import uk.gov.justice.laa.cwa.bulkupload.service.CwaUploadService;
 
-import java.util.List;
-
-/**
- * Helper class to fetch and populate providers in the model.
- */
-
+/** Helper class to fetch and populate providers in the model. */
 @Component
 public class ProviderHelper {
 

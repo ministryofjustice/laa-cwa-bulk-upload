@@ -20,10 +20,10 @@ class ProviderHelperTest {
 
   private static final String USERNAME = "TESTUSER";
 
-    private CwaUploadService cwaUploadService;
-    private ProviderHelper providerHelper;
-    private Model model;
-    private Principal principal;
+  private CwaUploadService cwaUploadService;
+  private ProviderHelper providerHelper;
+  private Model model;
+  private Principal principal;
 
   @BeforeEach
   void setUp() {
