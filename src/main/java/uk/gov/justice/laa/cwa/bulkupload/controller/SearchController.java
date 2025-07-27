@@ -1,11 +1,12 @@
 package uk.gov.justice.laa.cwa.bulkupload.controller;
 
-import java.security.Principal;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
@@ -30,15 +31,12 @@ public class SearchController {
    * @param provider the selected provider
    * @param searchTerm the search term (file reference)
    * @param model the model to add attributes to
-   * @param principal the authenticated user principal
+   * @param oidcUser the authenticated user principal
    * @return the name of the view to render
    */
   @PostMapping("/search")
   public String submitForm(
-      String provider, String searchTerm, Model model, Principal principal, String selectedUser) {
-    // @TODO: remove when LASSIE is integrated
-    model.addAttribute("selectedUser", selectedUser);
-    String username = getUsername(principal, selectedUser);
+      String provider, String searchTerm, Model model, @AuthenticationPrincipal OidcUser oidcUser) {
 
     Map<String, String> errors = new LinkedHashMap<>();
 
@@ -51,27 +49,27 @@ public class SearchController {
     }
 
     if (!errors.isEmpty()) {
-      return handleErrors(model, username, provider, searchTerm, errors);
+      return handleErrors(model, oidcUser.getName(), provider, searchTerm, errors);
     }
 
     List<CwaUploadSummaryResponseDto> summary;
     try {
-      summary = cwaUploadService.getUploadSummary(searchTerm, username, provider);
+      summary = cwaUploadService.getUploadSummary(searchTerm, oidcUser.getName(), provider);
       model.addAttribute("summary", summary);
     } catch (Exception e) {
       log.error("Error retrieving upload summary: {}", e.getMessage());
       errors.put("search", "Search failed please try again.");
-      return handleErrors(model, username, provider, searchTerm, errors);
+      return handleErrors(model, oidcUser.getName(), provider, searchTerm, errors);
     }
 
     try {
       List<CwaUploadErrorResponseDto> uploadErrors =
-          cwaUploadService.getUploadErrors(searchTerm, username, provider);
+          cwaUploadService.getUploadErrors(searchTerm, oidcUser.getName(), provider);
       model.addAttribute("errors", uploadErrors);
     } catch (Exception e) {
       log.error("Error retrieving upload errors: {}", e.getMessage());
       errors.put("search", "Search failed please try again.");
-      return handleErrors(model, username, provider, searchTerm, errors);
+      return handleErrors(model, oidcUser.getName(), provider, searchTerm, errors);
     }
 
     return "pages/submission-results";
@@ -109,13 +107,5 @@ public class SearchController {
     model.addAttribute("tab", "search");
 
     return "pages/upload";
-  }
-
-  private String getUsername(Principal principal, String selectedUser) {
-    // @TODO: Use instead when LASSIE is integrated
-    // String username = ((DefaultOidcUser) ((OAuth2AuthenticationToken) principal).getPrincipal())
-    // .getIdToken().getClaims().get("name").toUpperCase();
-
-    return selectedUser.toUpperCase();
   }
 }

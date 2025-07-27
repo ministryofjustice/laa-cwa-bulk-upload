@@ -1,6 +1,5 @@
 package uk.gov.justice.laa.cwa.bulkupload.controller;
 
-import java.security.Principal;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -10,6 +9,8 @@ import java.util.concurrent.TimeoutException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -40,17 +41,14 @@ public class SubmissionController {
    */
   @PostMapping("/submit")
   public String submitFile(
-      String fileId, String provider, Model model, Principal principal, String selectedUser) {
-    // @TODO: remove when LASSIE is integrated
-    model.addAttribute("selectedUser", selectedUser);
-
-    String username = getUsername(principal, selectedUser);
+      String fileId, String provider, Model model, @AuthenticationPrincipal OidcUser oidcUser) {
 
     CwaSubmissionResponseDto cwaSubmissionResponseDto;
     ExecutorService executor = Executors.newSingleThreadExecutor();
     try {
       Future<CwaSubmissionResponseDto> future =
-          executor.submit(() -> cwaUploadService.processSubmission(fileId, username, provider));
+          executor.submit(
+              () -> cwaUploadService.processSubmission(fileId, oidcUser.getName(), provider));
       cwaSubmissionResponseDto = future.get(cwaApiTimeout, TimeUnit.SECONDS);
     } catch (TimeoutException e) {
       // Handle timeout
@@ -67,7 +65,7 @@ public class SubmissionController {
 
     try {
       List<CwaUploadSummaryResponseDto> summary =
-          cwaUploadService.getUploadSummary(fileId, username, provider);
+          cwaUploadService.getUploadSummary(fileId, oidcUser.getName(), provider);
       model.addAttribute("summary", summary);
     } catch (Exception e) {
       log.error("Error retrieving upload summary: {}", e.getMessage());
@@ -78,7 +76,7 @@ public class SubmissionController {
         || !"success".equalsIgnoreCase(cwaSubmissionResponseDto.getStatus())) {
       try {
         List<CwaUploadErrorResponseDto> errors =
-            cwaUploadService.getUploadErrors(fileId, username, provider);
+            cwaUploadService.getUploadErrors(fileId, oidcUser.getName(), provider);
         model.addAttribute("errors", errors);
       } catch (Exception e) {
         log.error("Error retrieving upload errors: {}", e.getMessage());
@@ -86,13 +84,5 @@ public class SubmissionController {
       }
     }
     return "pages/submission-results";
-  }
-
-  private String getUsername(Principal principal, String selectedUser) {
-    // @TODO: Use instead when LASSIE is integrated
-    // String username = ((DefaultOidcUser) ((OAuth2AuthenticationToken) principal).getPrincipal())
-    // .getIdToken().getClaims().get("name").toUpperCase();
-
-    return selectedUser.toUpperCase();
   }
 }

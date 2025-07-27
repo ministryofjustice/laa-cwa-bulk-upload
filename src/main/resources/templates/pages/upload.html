@@ -42,8 +42,6 @@
                                     th:text="${provider.vendorName}"
                                     th:selected="${provider.vendorId == selectedProvider}"></option>
                         </select>
-                        <!-- @TODO: remove when LASSIE is integrated -->
-                        <input id="selectedUser" name="selectedUser" type="hidden" th:value="${selectedUser}"/>
                     </div>
 
                     <input id="selected-tab" name="selected-tab" type="hidden" th:value="${tab}"/>

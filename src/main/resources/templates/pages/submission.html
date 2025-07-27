@@ -16,8 +16,6 @@
                 <form id="submitForm" th:action="@{/submit}" method="POST" enctype="multipart/form-data">
                     <input id="fileId" name="fileId" type="hidden" th:value="${fileId}"/>
                     <input id="provider" name="provider" type="hidden" th:value="${provider}"/>
-                    <!-- @TODO: remove when LASSIE is integrated -->
-                    <input id="selectedUser" name="selectedUser" type="hidden" th:value="${selectedUser}"/>
                     <div class="govuk-grid-row">
                         <div class="govuk-grid-column-full">
                             <button id="primary-button" type="submit" class="govuk-button" data-module="govuk-button">

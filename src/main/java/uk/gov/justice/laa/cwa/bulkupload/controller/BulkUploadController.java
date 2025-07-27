@@ -1,12 +1,13 @@
 package uk.gov.justice.laa.cwa.bulkupload.controller;
 
-import java.security.Principal;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
@@ -37,48 +38,15 @@ public class BulkUploadController {
   /**
    * Renders the upload page.
    *
+   * @param model the model to be populated with data
+   * @param oidcUser the authenticated user principal
    * @return the upload page
    */
   @GetMapping("/")
-  public String showSelectUserPage() {
-    return "pages/select-user";
-  }
+  public String showUploadPage(Model model, @AuthenticationPrincipal OidcUser oidcUser) {
 
-  /**
-   * Handles the selection of a user and redirects to the upload page.
-   *
-   * @param model the model to be populated with data
-   * @param principal the authenticated user principal
-   * @param selectedUser the selected user ID
-   * @return the upload page
-   */
-  @PostMapping("/select-user")
-  public String selectUser(Model model, Principal principal, String selectedUser) {
-    Map<String, String> errors = new LinkedHashMap<>();
-    if (!StringUtils.hasText(selectedUser)) {
-      errors.put("selectedUser", "Please select a test user");
-      model.addAttribute("errors", errors);
-      return "pages/select-user";
-    }
-
-    return showUploadPage(model, principal, selectedUser);
-  }
-
-  /**
-   * Renders the upload page.
-   *
-   * @param model the model to be populated with data
-   * @param principal the authenticated user principal
-   * @return the upload page
-   */
-  @GetMapping("/home")
-  public String showUploadPage(Model model, Principal principal, String selectedUser) {
-    // @TODO: remove when LASSIE is integrated
-    model.addAttribute("selectedUser", selectedUser);
-
-    String username = getUsername(principal, selectedUser);
     try {
-      providerHelper.populateProviders(model, username);
+      providerHelper.populateProviders(model, oidcUser.getName());
     } catch (HttpClientErrorException e) {
       log.error("HTTP client error fetching providers from CWA with message: {} ", e.getMessage());
       if (e.getStatusCode() == HttpStatus.FORBIDDEN) {
@@ -100,7 +68,7 @@ public class BulkUploadController {
    * @param file the file to be uploaded
    * @param provider the selected provider
    * @param model the model to be populated with data
-   * @param principal the authenticated user principal
+   * @param oidcUser the authenticated user principal
    * @return the submission page
    */
   @PostMapping("/upload")
@@ -108,12 +76,7 @@ public class BulkUploadController {
       @RequestParam("fileUpload") MultipartFile file,
       String provider,
       Model model,
-      Principal principal,
-      String selectedUser) {
-    // @TODO: remove when LASSIE is integrated
-    model.addAttribute("selectedUser", selectedUser);
-
-    String username = getUsername(principal, selectedUser);
+      @AuthenticationPrincipal OidcUser oidcUser) {
 
     long maxFileSize = DataSize.parse(fileSizeLimit).toBytes();
     Map<String, String> errors = new LinkedHashMap<>();
@@ -140,12 +103,12 @@ public class BulkUploadController {
     }
 
     if (!errors.isEmpty()) {
-      return showErrorOnUpload(model, username, provider, errors);
+      return showErrorOnUpload(model, oidcUser.getName(), provider, errors);
     }
 
     try {
       CwaUploadResponseDto cwaUploadResponseDto =
-          cwaUploadService.uploadFile(file, provider, username);
+          cwaUploadService.uploadFile(file, provider, oidcUser.getName());
       log.info("CWA Upload response fileId: {}", cwaUploadResponseDto.getFileId());
 
       model.addAttribute("fileId", cwaUploadResponseDto.getFileId());
@@ -155,7 +118,7 @@ public class BulkUploadController {
     } catch (Exception e) {
       log.error("Failed to upload file to CWA with message: {}", e.getMessage());
       errors.put("fileUpload", "An error occurred while uploading the file.");
-      return showErrorOnUpload(model, username, provider, errors);
+      return showErrorOnUpload(model, oidcUser.getName(), provider, errors);
     }
   }
 
@@ -175,13 +138,5 @@ public class BulkUploadController {
     model.addAttribute(
         "selectedProvider", !StringUtils.hasText(provider) ? 0 : Integer.parseInt(provider));
     return "pages/upload";
-  }
-
-  private String getUsername(Principal principal, String selectedUser) {
-    // @TODO: Use instead when LASSIE is integrated
-    // String username = ((DefaultOidcUser) ((OAuth2AuthenticationToken) principal).getPrincipal())
-    // .getIdToken().getClaims().get("name").toUpperCase();
-
-    return selectedUser.toUpperCase();
   }
 }
