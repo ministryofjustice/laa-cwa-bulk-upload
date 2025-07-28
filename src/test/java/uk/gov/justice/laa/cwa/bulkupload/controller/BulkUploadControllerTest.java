@@ -6,6 +6,8 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.oidcLogin;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -13,14 +15,22 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
-import java.security.Principal;
+import java.time.Instant;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.oauth2.core.oidc.OidcIdToken;
+import org.springframework.security.oauth2.core.oidc.OidcUserInfo;
+import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.ui.Model;
@@ -32,11 +42,11 @@ import uk.gov.justice.laa.cwa.bulkupload.service.CwaUploadService;
 import uk.gov.justice.laa.cwa.bulkupload.service.VirusCheckService;
 
 @WebMvcTest(BulkUploadController.class)
-@AutoConfigureMockMvc(addFilters = false)
+@ExtendWith(MockitoExtension.class)
 class BulkUploadControllerTest {
 
   private static final String PROVIDER = "123";
-  private static final String TEST_USER = "TESTUSER";
+  private static final String TEST_USER = "test@example.com";
 
   @Autowired private MockMvc mockMvc;
 
@@ -46,14 +56,17 @@ class BulkUploadControllerTest {
 
   @MockitoBean private ProviderHelper providerHelper;
 
-  @Mock private Principal principal;
+  private OidcUser getOidcUser() {
+    Map<String, Object> claims = new HashMap<>();
+    claims.put("sub", "1234567890");
+    claims.put("email", "test@example.com");
 
-  @Test
-  void shouldReturnUploadPage() throws Exception {
-    mockMvc
-        .perform(get("/"))
-        .andExpect(status().isOk())
-        .andExpect(view().name("pages/select-user"));
+    OidcIdToken oidcIdToken =
+        new OidcIdToken("token123", Instant.now(), Instant.now().plusSeconds(60), claims);
+    OidcUserInfo oidcUserInfo = new OidcUserInfo(claims);
+
+    return new DefaultOidcUser(
+        List.of(new SimpleGrantedAuthority("ROLE_USER")), oidcIdToken, oidcUserInfo, "email");
   }
 
   @Test
@@ -63,7 +76,7 @@ class BulkUploadControllerTest {
         .populateProviders(any(Model.class), eq(TEST_USER));
 
     mockMvc
-        .perform(get("/home").param("selectedUser", TEST_USER))
+        .perform(get("/").with(oidcLogin().oidcUser(getOidcUser())))
         .andExpect(status().isOk())
         .andExpect(view().name("pages/upload-forbidden"));
   }
@@ -75,7 +88,7 @@ class BulkUploadControllerTest {
         .populateProviders(any(Model.class), eq(TEST_USER));
 
     mockMvc
-        .perform(get("/home").param("selectedUser", TEST_USER))
+        .perform(get("/").with(oidcLogin().oidcUser(getOidcUser())))
         .andExpect(status().isOk())
         .andExpect(view().name("error"));
   }
@@ -86,7 +99,8 @@ class BulkUploadControllerTest {
         new MockMultipartFile("fileUpload", "test.pdf", "application/pdf", "test".getBytes());
 
     mockMvc
-        .perform(multipart("/upload").file(file).param("selectedUser", TEST_USER))
+        .perform(
+            multipart("/upload").file(file).with(csrf()).with(oidcLogin().oidcUser(getOidcUser())))
         .andExpect(status().isOk())
         .andExpect(view().name("pages/upload"))
         .andExpect(content().string(containsString("Please select a provider")));
@@ -102,7 +116,8 @@ class BulkUploadControllerTest {
             multipart("/upload")
                 .file(emptyFile)
                 .param("provider", PROVIDER)
-                .param("selectedUser", TEST_USER))
+                .with(csrf())
+                .with(oidcLogin().oidcUser(getOidcUser())))
         .andExpect(status().isOk())
         .andExpect(view().name("pages/upload"))
         .andExpect(content().string(containsString("Please select a file to upload")));
@@ -118,7 +133,8 @@ class BulkUploadControllerTest {
             multipart("/upload")
                 .file(file)
                 .param("provider", PROVIDER)
-                .param("selectedUser", TEST_USER))
+                .with(csrf())
+                .with(oidcLogin().oidcUser(getOidcUser())))
         .andExpect(status().isOk())
         .andExpect(view().name("pages/upload"))
         .andExpect(content().string(containsString("File size must not exceed 10MB")));
@@ -136,7 +152,8 @@ class BulkUploadControllerTest {
             multipart("/upload")
                 .file(file)
                 .param("provider", PROVIDER)
-                .param("selectedUser", TEST_USER))
+                .with(csrf())
+                .with(oidcLogin().oidcUser(getOidcUser())))
         .andExpect(status().isOk())
         .andExpect(view().name("pages/upload"))
         .andExpect(
@@ -149,19 +166,18 @@ class BulkUploadControllerTest {
   void shouldReturnErrorWhenUploadServiceFails() throws Exception {
     MockMultipartFile file =
         new MockMultipartFile("fileUpload", "test.csv", "text/csv", "test".getBytes());
-    doNothing().when(virusCheckService).checkVirus(file);
-    when(principal.getName()).thenReturn(TEST_USER);
+    doNothing().when(virusCheckService).checkVirus(any(MultipartFile.class));
     doThrow(new RuntimeException("Upload failed"))
         .when(cwaUploadService)
-        .uploadFile(file, PROVIDER, TEST_USER);
+        .uploadFile(any(MultipartFile.class), eq(PROVIDER), any(String.class));
 
     mockMvc
         .perform(
             multipart("/upload")
                 .file(file)
                 .param("provider", PROVIDER)
-                .principal(principal)
-                .param("selectedUser", TEST_USER))
+                .with(csrf())
+                .with(oidcLogin().oidcUser(getOidcUser())))
         .andExpect(status().isOk())
         .andExpect(view().name("pages/upload"))
         .andExpect(content().string(containsString("An error occurred while uploading the file.")));
@@ -169,21 +185,21 @@ class BulkUploadControllerTest {
 
   @Test
   void shouldUploadFileSuccessfully() throws Exception {
-    MockMultipartFile file =
-        new MockMultipartFile("fileUpload", "test.csv", "text/csv", "test".getBytes());
-    when(principal.getName()).thenReturn(TEST_USER);
-    doNothing().when(virusCheckService).checkVirus(file);
+    doNothing().when(virusCheckService).checkVirus(any(MultipartFile.class));
     CwaUploadResponseDto response = new CwaUploadResponseDto();
     response.setFileId("file123");
-    when(cwaUploadService.uploadFile(file, PROVIDER, TEST_USER)).thenReturn(response);
+    when(cwaUploadService.uploadFile(any(MultipartFile.class), eq(PROVIDER), any(String.class)))
+        .thenReturn(response);
+    MockMultipartFile file =
+        new MockMultipartFile("fileUpload", "test.csv", "text/csv", "test".getBytes());
 
     mockMvc
         .perform(
             multipart("/upload")
                 .file(file)
                 .param("provider", PROVIDER)
-                .principal(principal)
-                .param("selectedUser", TEST_USER))
+                .with(csrf())
+                .with(oidcLogin().oidcUser(getOidcUser())))
         .andExpect(status().isOk())
         .andExpect(view().name("pages/submission"));
   }
@@ -198,7 +214,8 @@ class BulkUploadControllerTest {
             multipart("/upload")
                 .file(file)
                 .param("provider", PROVIDER)
-                .param("selectedUser", TEST_USER))
+                .with(csrf())
+                .with(oidcLogin().oidcUser(getOidcUser())))
         .andExpect(status().isOk())
         .andExpect(model().attribute("selectedProvider", 123));
   }

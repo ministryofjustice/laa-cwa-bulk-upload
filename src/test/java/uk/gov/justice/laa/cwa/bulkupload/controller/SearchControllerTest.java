@@ -18,6 +18,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.security.oauth2.core.oidc.OidcIdToken;
+import org.springframework.security.oauth2.core.oidc.OidcUserInfo;
+import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
 import org.springframework.ui.Model;
 import uk.gov.justice.laa.cwa.bulkupload.helper.ProviderHelper;
 import uk.gov.justice.laa.cwa.bulkupload.response.CwaUploadErrorResponseDto;
@@ -49,7 +52,8 @@ class SearchControllerTest {
 
   @Test
   void submitForm_shouldReturnError_whenProviderIsMissing() {
-    String view = searchController.submitForm("", SEARCH_TERM, model, principal, TEST_USER);
+
+    String view = searchController.submitForm("", SEARCH_TERM, model, getDefaultOidcUser());
 
     verify(model)
         .addAttribute(
@@ -57,9 +61,15 @@ class SearchControllerTest {
     assertEquals("pages/upload", view);
   }
 
+  private static DefaultOidcUser getDefaultOidcUser() {
+    OidcUserInfo userInfo = OidcUserInfo.builder().email(TEST_USER).build();
+    OidcIdToken token = OidcIdToken.withTokenValue("token").claim("email", TEST_USER).build();
+    return new DefaultOidcUser(Collections.emptyList(), token, userInfo, "email");
+  }
+
   @Test
   void submitForm_shouldReturnError_whenSearchTermIsInvalid() {
-    String view = searchController.submitForm(PROVIDER, "", model, principal, TEST_USER);
+    String view = searchController.submitForm(PROVIDER, "", model, getDefaultOidcUser());
 
     verify(model)
         .addAttribute(
@@ -72,7 +82,7 @@ class SearchControllerTest {
     when(cwaUploadService.getUploadSummary(SEARCH_TERM, TEST_USER, PROVIDER))
         .thenThrow(new RuntimeException("fail"));
 
-    String view = searchController.submitForm(PROVIDER, SEARCH_TERM, model, principal, TEST_USER);
+    String view = searchController.submitForm(PROVIDER, SEARCH_TERM, model, getDefaultOidcUser());
 
     verify(model)
         .addAttribute(eq("errors"), argThat(errors -> ((Map<?, ?>) errors).containsKey("search")));
@@ -87,7 +97,7 @@ class SearchControllerTest {
     when(cwaUploadService.getUploadErrors(SEARCH_TERM, TEST_USER, PROVIDER))
         .thenReturn(uploadErrors);
 
-    String view = searchController.submitForm(PROVIDER, SEARCH_TERM, model, principal, TEST_USER);
+    String view = searchController.submitForm(PROVIDER, SEARCH_TERM, model, getDefaultOidcUser());
 
     verify(model).addAttribute("summary", summary);
     verify(model).addAttribute("errors", uploadErrors);
