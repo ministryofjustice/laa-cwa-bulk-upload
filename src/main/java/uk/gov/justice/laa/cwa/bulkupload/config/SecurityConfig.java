@@ -4,7 +4,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
@@ -68,8 +67,12 @@ public class SecurityConfig {
             (requests) ->
                 requests
                     .requestMatchers(
-                        "/assets/**", "/javascripts/**", "/stylesheets/**", "/webjars/**",
-                        "/login", "/logout")
+                        "/assets/**",
+                        "/javascripts/**",
+                        "/stylesheets/**",
+                        "/webjars/**",
+                        "/login",
+                        "/logout")
                     .permitAll()
                     .anyRequest()
                     .authenticated())
@@ -79,17 +82,17 @@ public class SecurityConfig {
                 sessionManagement.invalidSessionStrategy(
                     // TODO: Change this once auth provider has been implemented.
                     new SimpleRedirectInvalidSessionStrategy("/login?invalid")))
-        .logout(httpSecurityLogoutConfigurer ->
-            httpSecurityLogoutConfigurer
-                .logoutUrl("/logout")
+        .logout(
+            httpSecurityLogoutConfigurer ->
+                httpSecurityLogoutConfigurer
+                    .logoutUrl("/logout")
                     // TODO: Change this once auth provider has been implemented.
-                .logoutSuccessUrl("/login?logout")
-                .permitAll()
-                .logoutRequestMatcher(
-                    e -> e.getRequestURI().startsWith("/logout")
-                        && e.getMethod().equals("GET"))
-                .invalidateHttpSession(true)
-                .clearAuthentication(true));
+                    .logoutSuccessUrl("/login?logout")
+                    .permitAll()
+                    .logoutRequestMatcher(
+                        e -> e.getRequestURI().startsWith("/logout") && e.getMethod().equals("GET"))
+                    .invalidateHttpSession(true)
+                    .clearAuthentication(true));
 
     return http.build();
   }
