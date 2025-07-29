@@ -10,7 +10,7 @@ spring:
     oauth2:
       client:
         registration:
-          lassie-identity:
+          silas-identity:
             client-id: ${LASSIE_CLIENT_ID}
             client-secret: ${LASSIE_CLIENT_SECRET}
             authorization-grant-type: authorization_code
@@ -22,7 +22,7 @@ spring:
             scope: ${AUTH_SCOPE}
             authorization-grant-type: client_credentials
         provider:
-          lassie-identity:
+          silas-identity:
             issuer-uri: https://login.microsoftonline.com/${LASSIE_TENANT_ID}/v2.0
             user-name-attribute: email
           moj-identity:
