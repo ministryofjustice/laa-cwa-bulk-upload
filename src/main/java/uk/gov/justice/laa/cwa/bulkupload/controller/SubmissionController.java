@@ -1,5 +1,6 @@
 package uk.gov.justice.laa.cwa.bulkupload.controller;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -17,15 +18,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import uk.gov.justice.laa.cwa.bulkupload.response.CwaSubmissionResponseDto;
 import uk.gov.justice.laa.cwa.bulkupload.response.CwaUploadErrorResponseDto;
 import uk.gov.justice.laa.cwa.bulkupload.response.CwaUploadSummaryResponseDto;
-import uk.gov.justice.laa.cwa.bulkupload.service.CwaUploadService;
 
 /** Controller for handling the submission of bulk upload. */
 @Slf4j
 @RequiredArgsConstructor
 @Controller
 public class SubmissionController {
-
-  private final CwaUploadService cwaUploadService;
 
   @Value("${cwa-api.timeout}")
   private int cwaApiTimeout;
@@ -46,9 +44,12 @@ public class SubmissionController {
     CwaSubmissionResponseDto cwaSubmissionResponseDto;
     ExecutorService executor = Executors.newSingleThreadExecutor();
     try {
+      // TODO: Submit to Claims API
       Future<CwaSubmissionResponseDto> future =
           executor.submit(
-              () -> cwaUploadService.processSubmission(fileId, oidcUser.getName(), provider));
+              () -> {
+                throw new RuntimeException("Submit not implemented");
+              });
       cwaSubmissionResponseDto = future.get(cwaApiTimeout, TimeUnit.SECONDS);
     } catch (TimeoutException e) {
       // Handle timeout
@@ -64,8 +65,8 @@ public class SubmissionController {
     }
 
     try {
-      List<CwaUploadSummaryResponseDto> summary =
-          cwaUploadService.getUploadSummary(fileId, oidcUser.getName(), provider);
+      // TODO: Get upload summary via Claims API
+      List<CwaUploadSummaryResponseDto> summary = Collections.emptyList();
       model.addAttribute("summary", summary);
     } catch (Exception e) {
       log.error("Error retrieving upload summary: {}", e.getMessage());
@@ -75,8 +76,8 @@ public class SubmissionController {
     if (cwaSubmissionResponseDto == null
         || !"success".equalsIgnoreCase(cwaSubmissionResponseDto.getStatus())) {
       try {
-        List<CwaUploadErrorResponseDto> errors =
-            cwaUploadService.getUploadErrors(fileId, oidcUser.getName(), provider);
+        // TODO: Get upload summary via Claims API
+        List<CwaUploadErrorResponseDto> errors = Collections.emptyList();
         model.addAttribute("errors", errors);
       } catch (Exception e) {
         log.error("Error retrieving upload errors: {}", e.getMessage());
