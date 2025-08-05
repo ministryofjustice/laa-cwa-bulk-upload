@@ -31,3 +31,16 @@ upload-max-file-size: ${UPLOAD_MAX_FILE_SIZE}
 rest-client:
   connect-timeout: ${REST_CLIENT_CONNECT_TIMEOUT}
   read-timeout: ${REST_CLIENT_READ_TIMEOUT}
+
+management:
+  endpoint:
+    health:
+      show-details: always
+      probes:
+        enabled: true
+  endpoints:
+    web:
+      exposure:
+        include:
+          - health
+          - info
